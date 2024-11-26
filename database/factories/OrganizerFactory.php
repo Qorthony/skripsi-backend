@@ -17,7 +17,18 @@ class OrganizerFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'nama'=>fake()->company(),
+            'deskripsi'=>fake()->sentence(),
+            'alamat'=>fake()->address()
         ];
+    }
+
+    public function userId(string $id): Factory
+    {
+        return $this->state(function (array $attributes) use($id) {
+            return [
+                'user_id' => $id,
+            ];
+        });
     }
 }

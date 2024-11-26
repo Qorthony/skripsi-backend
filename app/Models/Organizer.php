@@ -11,4 +11,11 @@ class Organizer extends Model
     /** @use HasFactory<\Database\Factories\OrganizerFactory> */
     use HasFactory;
     use HasUuids;
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array<string>|bool
+     */
+    protected $guarded = [];
 }

@@ -11,4 +11,11 @@ class EventSubmission extends Model
     /** @use HasFactory<\Database\Factories\EventSubmissionFactory> */
     use HasFactory;
     use HasUuids;
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array<string>|bool
+     */
+    protected $guarded = [];
 }
