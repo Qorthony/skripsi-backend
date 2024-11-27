@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends Model
@@ -23,5 +24,15 @@ class Event extends Model
     public function tickets() : HasMany 
     {
         return $this->hasMany(Ticket::class);    
+    }
+
+    public function organizer() : BelongsTo
+    {
+        return $this->belongsTo(Organizer::class);
+    }
+
+    public function eventSubmissions() : HasMany
+    {
+        return $this->hasMany(EventSubmission::class);
     }
 }

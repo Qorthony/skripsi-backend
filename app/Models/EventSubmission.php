@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EventSubmission extends Model
 {
@@ -18,4 +19,9 @@ class EventSubmission extends Model
      * @var array<string>|bool
      */
     protected $guarded = [];
+
+    public function event() : BelongsTo
+    {
+        return $this->belongsTo(Event::class);
+    }
 }
