@@ -19,7 +19,12 @@ class Organizer extends Model
      *
      * @var array<string>|bool
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'nama',
+        'alamat',
+        'deskripsi',
+        'user_id',
+    ];
 
     public function events() : HasMany
     {

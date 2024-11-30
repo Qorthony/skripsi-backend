@@ -30,6 +30,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink
+                                    href={route('events.index')}
+                                    active={route().current('events.index')}
+                                >
+                                    Events
+                                </NavLink>
                             </div>
                         </div>
 
@@ -65,6 +71,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('profile.edit')}
                                         >
                                             Profile
+                                        </Dropdown.Link>
+                                        <Dropdown.Link
+                                            href={route('organizer.index')}
+                                        >
+                                            Organizer
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}

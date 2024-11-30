@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -12,11 +13,29 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::group([
+    'middleware' => ['auth', 'verified'],
+    'prefix' => 'dashboard',
+], function () {
+
+    Route::get('/organizer', [OrganizerController::class, 'index'])->name('organizer.index');
+
+    Route::post('/organizer', [OrganizerController::class, 'store'])->name('organizer.store');
+
+    Route::middleware('hasOrganizer')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('Dashboard');
+        })->name('dashboard');
+        
+        Route::patch('/organizer', [OrganizerController::class, 'update'])->name('organizer.update');
+
+        Route::get('/events', function () {
+            return Inertia::render('Event/Index');
+        })->name('events.index');
+    });
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
