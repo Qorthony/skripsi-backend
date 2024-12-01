@@ -33,10 +33,17 @@ class OrganizerController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
+            'newLogo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'nama' => 'required|string|max:255',
             'alamat' => 'required|string|max:255',
             'deskripsi' => 'nullable|string|max:255',
         ]);
+
+        if ($request->hasFile('newLogo')) {
+            $validated['logo'] = $request->file('newLogo')->store('organizer-logo', 'public');
+        } else {
+            $validated['logo'] = Auth::user()->organizer->logo;
+        }
 
         Auth::user()->organizer->update($validated);
 

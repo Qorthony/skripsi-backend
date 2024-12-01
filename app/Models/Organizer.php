@@ -24,6 +24,7 @@ class Organizer extends Model
         'alamat',
         'deskripsi',
         'user_id',
+        'logo',
     ];
 
     public function events() : HasMany

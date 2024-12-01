@@ -6,20 +6,40 @@ import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import clsx from 'clsx';
 import { Textarea, Transition } from '@headlessui/react';
+import { useRef } from 'react';
 
 export default function Index({ organizer }) {
-    const { data, setData, post,patch, errors, processing, recentlySuccessful } =
+    const { data, setData, post, errors, processing, recentlySuccessful } =
         useForm({
+            logo: organizer?.logo || null,
+            newLogo: null,
             nama: organizer?.nama || '',
             alamat: organizer?.alamat || '',
             deskripsi: organizer?.deskripsi || '',
+            _method: organizer ? 'put' : 'post',
         });
+    
+    const newLogoRef = useRef(null);
+    
+    let preview = null;
+    
+    if (data.newLogo instanceof File) {
+        preview = URL.createObjectURL(data.newLogo);
+    } else if (data.logo.startsWith('organizer-logo')) {
+        preview = `/storage/${data.logo}`;
+    }
+
+    const selectImage = (e) => {
+        setData('newLogo', e.target.files[0]);
+    };
 
     const submit = (e) => {
         e.preventDefault();
 
         if (organizer) {
-            patch(route('organizer.update', organizer.id));
+            post(route('organizer.update'),{
+                preserveScroll: true,
+            });
         } else {
             post(route('organizer.store'));
         }
@@ -46,6 +66,25 @@ export default function Index({ organizer }) {
                             </header>
 
                             <form onSubmit={submit} className="mt-6 space-y-6">
+                                <div>
+                                    <InputLabel htmlFor="newLogo" value="Logo"/>
+
+                                    {preview && (
+                                        <img src={preview} alt="Logo" className="w-20 h-20 my-2 object-cover rounded-full" />
+                                    )}
+
+                                    <TextInput
+                                        id="newLogo"
+                                        type="file"
+                                        ref={newLogoRef}
+                                        accept="image/*"
+                                        className="mt-1 block w-full"
+                                        onChange={selectImage}
+                                    />
+
+                                    <InputError className="mt-2" message={errors.newLogo} />
+                                </div>
+
                                 <div>
                                     <InputLabel htmlFor="nama" value="Nama" required />
 

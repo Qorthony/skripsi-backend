@@ -28,8 +28,8 @@ Route::group([
         Route::get('/', function () {
             return Inertia::render('Dashboard');
         })->name('dashboard');
-        
-        Route::patch('/organizer', [OrganizerController::class, 'update'])->name('organizer.update');
+
+        Route::put('/organizer', [OrganizerController::class, 'update'])->name('organizer.update');
 
         Route::get('/events', function () {
             return Inertia::render('Event/Index');
