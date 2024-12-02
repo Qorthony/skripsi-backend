@@ -32,9 +32,7 @@ Route::group([
 
         Route::put('/organizer', [OrganizerController::class, 'update'])->name('organizer.update');
 
-        Route::get('/events', function () {
-            return Inertia::render('Event/Index');
-        })->name('events.index');
+        Route::get('/events', [EventController::class, 'index'])->name('events.index');
 
         Route::get('/events/create', function () {
             return Inertia::render('Event/Form');

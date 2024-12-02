@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Inertia\Inertia;
 class EventController extends Controller
 {
+    public function index()
+    {
+        return Inertia::render('Event/Index', [
+            'events' => Event::where('organizer_id', Auth::user()->organizer->id)->get()
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
