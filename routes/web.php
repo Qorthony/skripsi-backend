@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -34,6 +35,12 @@ Route::group([
         Route::get('/events', function () {
             return Inertia::render('Event/Index');
         })->name('events.index');
+
+        Route::get('/events/create', function () {
+            return Inertia::render('Event/Form');
+        })->name('events.create');
+
+        Route::post('/events', [EventController::class, 'store'])->name('events.store');
     });
 });
 

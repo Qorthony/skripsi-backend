@@ -1,10 +1,11 @@
+import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 
 export default function Index() {
     return (
         <AuthenticatedLayout
-            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Events</h2>}
+            header={<Header />}
         >
             <Head title="Events" />
             <div className="py-12">
@@ -17,3 +18,12 @@ export default function Index() {
         </AuthenticatedLayout>
     );
 }
+
+const Header = () => {
+    return (
+        <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold leading-tight text-gray-800">Events</h2>
+            <PrimaryButton onClick={() => router.visit(route('events.create'))}>Create Event</PrimaryButton>
+        </div>
+    );
+};
