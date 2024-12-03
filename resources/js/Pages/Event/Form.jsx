@@ -10,6 +10,7 @@ import { Textarea } from "@headlessui/react";
 import Loader from "@/Components/Loader";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TicketForm from "./Partials/TicketForm";
+import { useEffect } from "react";
 
 export default function Form({ event, tickets }) {
     const { data, setData, post, errors, processing } = useForm({
@@ -25,14 +26,35 @@ export default function Form({ event, tickets }) {
         _method: event ? 'put' : 'post',
     });
 
+    console.log(document.body.scrollHeight);
+    useEffect(() => {
+        if (event) {
+            setTimeout(() => {
+                console.log('scroll');
+                
+                scrollTo({
+                    top: document.body.scrollHeight,
+                behavior: 'smooth',
+                });
+            }, 500);
+        }
+    }, [data._method]);
+    
+
     const submit = (e) => {
         e.preventDefault();
-        console.log(data);
 
         if (event) {
-            post(route('events.update', event.id));
+            post(route('events.update', event.id), {
+                preserveScroll: true,
+            });
         } else {
-            post(route('events.store'));
+            post(route('events.store'), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setData('_method', 'put');
+                },
+            });
         }
     };
 

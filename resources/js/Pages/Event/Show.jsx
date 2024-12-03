@@ -64,6 +64,9 @@ export default function Show({ event, tickets }) {
 
                             <div className="mt-6">
                                 <h3 className="text-lg font-medium text-gray-900">Tiket</h3>
+                                {tickets.length == 0 && (
+                                    <p className="text-sm text-gray-600">Belum ada tiket yang terdaftar</p>
+                                )}
                                 <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                     {tickets.map((ticket, index) => (
                                         <div key={index} className="bg-white border rounded-lg shadow-sm p-4">

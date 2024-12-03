@@ -12,7 +12,7 @@ class EventController extends Controller
     public function index()
     {
         return Inertia::render('Event/Index', [
-            'events' => Event::where('organizer_id', Auth::user()->organizer->id)->get()
+            'events' => Event::where('organizer_id', Auth::user()->organizer->id)->latest()->get()
         ]);
     }
 
@@ -37,7 +37,6 @@ class EventController extends Controller
 
         $validated['organizer_id'] = Auth::user()->organizer->id;
         $validated['status'] = 'draft';
-        // dd($validated);
 
         $event = Event::create($validated);
 

@@ -90,7 +90,8 @@ export default function TicketForm({ event, tickets }) {
                             <TicketItemForm 
                                 type="free" 
                                 event={event} 
-                                ticketEdit={ticketEdit}
+                                ticketEdit={ticketEdit} 
+                                setTicketEdit={setTicketEdit}
                                 setActiveForm={setActiveForm}
                             />
                         }
@@ -99,6 +100,7 @@ export default function TicketForm({ event, tickets }) {
                                 type="paid" 
                                 event={event} 
                                 ticketEdit={ticketEdit}
+                                setTicketEdit={setTicketEdit}
                                 setActiveForm={setActiveForm}
                             />
                         }
@@ -110,7 +112,7 @@ export default function TicketForm({ event, tickets }) {
     );
 }
 
-const TicketItemForm = ({type, event, setActiveForm, ticketEdit}) => {
+const TicketItemForm = ({type, event, setActiveForm, ticketEdit, setTicketEdit}) => {
     const { data, setData, post, put, errors, processing } = useForm({
         nama: ticketEdit ? ticketEdit.nama : '',
         kuota: ticketEdit ? ticketEdit.kuota : '',
@@ -127,6 +129,7 @@ const TicketItemForm = ({type, event, setActiveForm, ticketEdit}) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     setActiveForm('');
+                    setTicketEdit(null);
                 }
             });
         } else {
@@ -134,10 +137,16 @@ const TicketItemForm = ({type, event, setActiveForm, ticketEdit}) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     setActiveForm('');
+                    setTicketEdit(null);
                 }
             });
         }
     };
+
+    const handleCancel = () => {
+        setActiveForm('');
+        setTicketEdit(null);
+    }
 
     return (
         <div className="space-y-6 max-w-xl">
@@ -221,10 +230,13 @@ const TicketItemForm = ({type, event, setActiveForm, ticketEdit}) => {
                 <InputError message={errors.keterangan} />
             </div>
 
-            <div>
+            <div className="flex space-x-2">
                 <PrimaryButton onClick={handleSubmit} disabled={processing}>
                     {processing ? <Loader /> : 'Save'}
                 </PrimaryButton>
+                <SecondaryButton onClick={handleCancel}>
+                    Cancel
+                </SecondaryButton>
             </div>
         </div>
     );
