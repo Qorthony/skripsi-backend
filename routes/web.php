@@ -43,10 +43,16 @@ Route::group([
         Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
 
         Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
-
+        
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
-
+        
         Route::post('/events/{event}/publish', [EventController::class, 'publish'])->name('events.publish');
+
+        Route::post('/events/{event}/ticket', [EventController::class, 'storeTicket'])->name('events.ticket.store');
+
+        Route::put('/events/ticket/{ticket}', [EventController::class, 'updateTicket'])->name('events.ticket.update');
+
+        Route::delete('/events/ticket/{ticket}', [EventController::class, 'destroyTicket'])->name('events.ticket.destroy');
     });
 });
 

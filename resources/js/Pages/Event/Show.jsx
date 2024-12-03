@@ -5,13 +5,15 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
 import DeleteEventForm from "./Partials/DeleteEventForm";
 import { useState } from "react";
+import dayjs from "dayjs";
 
-export default function Show({ event }) {
+export default function Show({ event, tickets }) {
     return (
         <AuthenticatedLayout
             header={<Header event={event} />}
         >
             <Head title={event.nama} />
+
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
@@ -59,6 +61,35 @@ export default function Show({ event }) {
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="mt-6">
+                                <h3 className="text-lg font-medium text-gray-900">Tiket</h3>
+                                <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                    {tickets.map((ticket, index) => (
+                                        <div key={index} className="bg-white border rounded-lg shadow-sm p-4">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h3 className="text-lg font-medium text-gray-900">{ticket.nama}</h3>
+                                                    <p className="text-sm text-gray-500">Kuota: {ticket.kuota}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-lg font-bold text-gray-900">
+                                                        {ticket.harga ? `Rp ${ticket.harga.toLocaleString('id-ID')}` : 'Gratis'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2 text-sm text-gray-600">
+                                                <p>Mulai: {dayjs(ticket.waktu_buka).format('DD/MM/YYYY HH:mm')}</p>
+                                                <p>Tutup: {dayjs(ticket.waktu_tutup).format('DD/MM/YYYY HH:mm')}</p>
+                                                {ticket.keterangan && (
+                                                    <p className="text-gray-500">{ticket.keterangan}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

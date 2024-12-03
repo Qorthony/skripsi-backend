@@ -9,8 +9,9 @@ import clsx from "clsx";
 import { Textarea } from "@headlessui/react";
 import Loader from "@/Components/Loader";
 import PrimaryButton from "@/Components/PrimaryButton";
+import TicketForm from "./Partials/TicketForm";
 
-export default function Form({ event }) {
+export default function Form({ event, tickets }) {
     const { data, setData, post, errors, processing } = useForm({
         nama: event?.nama ?? '',
         poster: event?.poster ?? '',
@@ -40,6 +41,7 @@ export default function Form({ event }) {
             header={<div className="text-xl font-semibold leading-tight text-gray-800">{event ? `Edit ` : "Create "}Event</div>}
         >
             <Head title={event ? `Edit ${event.nama}` : "Create Event"} />
+
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden p-4 bg-white shadow-sm sm:rounded-lg">
@@ -166,6 +168,10 @@ export default function Form({ event }) {
                     </div>
                 </div>
             </div>
+
+            {event && (
+                <TicketForm event={event} tickets={tickets} />
+            )}
         </AuthenticatedLayout>
     );
 }
