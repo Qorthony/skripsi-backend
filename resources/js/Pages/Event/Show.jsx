@@ -6,6 +6,7 @@ import { Head, router } from "@inertiajs/react";
 import DeleteEventForm from "./Partials/DeleteEventForm";
 import { useState } from "react";
 import dayjs from "dayjs";
+import AfterSubmissionModal from "./Partials/AfterSubmissionModal";
 
 export default function Show({ event, tickets }) {
     return (
@@ -103,10 +104,22 @@ export default function Show({ event, tickets }) {
 
 const Header = ({ event }) => {
     const [showModal, setShowModal] = useState(false);
+    const [showAfterSubmissionModal, setShowAfterSubmissionModal] = useState(false);
 
     const confirmUserDeletion = (e) => {
         e.preventDefault();
         setShowModal(true);
+    }
+
+    const handleSubmitEvent = (e) => {
+        e.preventDefault();
+        router.post(route('events.publish', event.id));
+        setShowAfterSubmissionModal(true);
+    }
+
+    const handleCancelPublish = (e) => {
+        e.preventDefault();
+        router.post(route('events.cancelPublish', event.id));
     }
 
     return (
@@ -131,8 +144,18 @@ const Header = ({ event }) => {
                     </PrimaryButton>
                 </Dropdown.Trigger>
                 <Dropdown.Content>
-                    <Dropdown.Link href={route('events.edit', event.id)}>Edit Event</Dropdown.Link>
-                    <Dropdown.Link onClick={confirmUserDeletion}>Delete Event</Dropdown.Link>
+                    {event.status === 'draft' && (
+                        <>
+                            <Dropdown.Link onClick={handleSubmitEvent}>Ajukan Event</Dropdown.Link>
+                            <Dropdown.Link href={route('events.edit', event.id)}>Edit Event</Dropdown.Link>
+                            <Dropdown.Link onClick={confirmUserDeletion}>Delete Event</Dropdown.Link>
+                        </>
+                    )}
+                    {event.status === 'in_review' && (
+                        <>
+                            <Dropdown.Link onClick={handleCancelPublish}>Batalkan Pengajuan</Dropdown.Link>
+                        </>
+                    )}
                 </Dropdown.Content>
             </Dropdown>
 
@@ -142,6 +165,10 @@ const Header = ({ event }) => {
                     closeModal={() => setShowModal(false)} 
                     deleteItem={event} 
                 />
+            </Modal>
+
+            <Modal show={showAfterSubmissionModal} onClose={() => setShowAfterSubmissionModal(false)}>
+                <AfterSubmissionModal onClose={() => setShowAfterSubmissionModal(false)} />
             </Modal>
         </div>
     );

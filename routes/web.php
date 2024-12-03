@@ -48,6 +48,8 @@ Route::group([
         
         Route::post('/events/{event}/publish', [EventController::class, 'publish'])->name('events.publish');
 
+        Route::post('/events/{event}/publish/cancel', [EventController::class, 'cancelPublish'])->name('events.cancelPublish');
+
         Route::post('/events/{event}/ticket', [EventController::class, 'storeTicket'])->name('events.ticket.store');
 
         Route::put('/events/ticket/{ticket}', [EventController::class, 'updateTicket'])->name('events.ticket.update');

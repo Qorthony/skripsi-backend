@@ -26,11 +26,9 @@ export default function Form({ event, tickets }) {
         _method: event ? 'put' : 'post',
     });
 
-    console.log(document.body.scrollHeight);
     useEffect(() => {
         if (event) {
             setTimeout(() => {
-                console.log('scroll');
                 
                 scrollTo({
                     top: document.body.scrollHeight,
