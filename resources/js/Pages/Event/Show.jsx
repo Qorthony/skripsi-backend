@@ -1,7 +1,10 @@
 import Dropdown from "@/Components/Dropdown";
+import Modal from "@/Components/Modal";
 import PrimaryButton from "@/Components/PrimaryButton";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
+import DeleteEventForm from "./Partials/DeleteEventForm";
+import { useState } from "react";
 
 export default function Show({ event }) {
     return (
@@ -65,6 +68,13 @@ export default function Show({ event }) {
 }
 
 const Header = ({ event }) => {
+    const [showModal, setShowModal] = useState(false);
+
+    const confirmUserDeletion = (e) => {
+        e.preventDefault();
+        setShowModal(true);
+    }
+
     return (
         <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold leading-tight text-gray-800">Detail Event</h2>
@@ -88,8 +98,17 @@ const Header = ({ event }) => {
                 </Dropdown.Trigger>
                 <Dropdown.Content>
                     <Dropdown.Link href={route('events.edit', event.id)}>Edit Event</Dropdown.Link>
+                    <Dropdown.Link onClick={confirmUserDeletion}>Delete Event</Dropdown.Link>
                 </Dropdown.Content>
             </Dropdown>
+
+            <Modal show={showModal} onClose={() => setShowModal(false)}>
+                <DeleteEventForm 
+                    className="max-w-md" 
+                    closeModal={() => setShowModal(false)} 
+                    deleteItem={event} 
+                />
+            </Modal>
         </div>
     );
 }

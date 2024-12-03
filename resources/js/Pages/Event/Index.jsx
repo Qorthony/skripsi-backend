@@ -1,11 +1,18 @@
+import { useState } from 'react';
+import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Table from '@/Components/Table';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
+import DeleteEventForm from './Partials/DeleteEventForm';
 
 export default function Index({ events }) {
+    const [showModal, setShowModal] = useState(false);
+    const [deleteItem, setDeleteItem] = useState(null);
     const deleteAction = (item) => {
         console.log('delete', item);
+        setShowModal(true);
+        setDeleteItem(item);
     }
     const editAction = (item) => {
         console.log('edit', item);
@@ -51,6 +58,14 @@ export default function Index({ events }) {
                                     data={events} 
                                     handleRowClick={(item) => router.visit(route('events.show', item.id))} 
                                 />
+
+                                <Modal show={showModal} onClose={() => setShowModal(false)}>
+                                    <DeleteEventForm 
+                                        className="max-w-md" 
+                                        closeModal={() => setShowModal(false)} 
+                                        deleteItem={deleteItem} 
+                                    />
+                                </Modal>
                             </div>
                         </div>
                     </div>
