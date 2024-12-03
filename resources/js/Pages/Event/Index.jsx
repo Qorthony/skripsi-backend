@@ -9,6 +9,7 @@ export default function Index({ events }) {
     }
     const editAction = (item) => {
         console.log('edit', item);
+        router.visit(route('events.edit', item.id));
     }
     const listAction = [
         {
@@ -48,7 +49,7 @@ export default function Index({ events }) {
                                     listAction={listAction} 
                                     tableHeader={tableHeader} 
                                     data={events} 
-                                    handleRowClick={(item) => console.log('row click', item)} 
+                                    handleRowClick={(item) => router.visit(route('events.show', item.id))} 
                                 />
                             </div>
                         </div>

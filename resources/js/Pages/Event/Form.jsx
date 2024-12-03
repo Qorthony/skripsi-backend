@@ -21,18 +21,23 @@ export default function Form({ event }) {
         jadwal_mulai: event?.jadwal_mulai ?? dayjs().add(1, 'week').format('YYYY-MM-DDTHH:mm'),
         jadwal_selesai: event?.jadwal_selesai ?? dayjs().add(1, 'week').add(1, 'hour').format('YYYY-MM-DDTHH:mm'),
         deskripsi: event?.deskripsi ?? '',
+        _method: event ? 'put' : 'post',
     });
 
     const submit = (e) => {
         e.preventDefault();
         console.log(data);
-        
-        post(route('events.store'));
+
+        if (event) {
+            post(route('events.update', event.id));
+        } else {
+            post(route('events.store'));
+        }
     };
 
     return (
         <AuthenticatedLayout 
-            header={<div className="text-xl font-semibold leading-tight text-gray-800">Create Event</div>}
+            header={<div className="text-xl font-semibold leading-tight text-gray-800">{event ? `Edit ` : "Create "}Event</div>}
         >
             <Head title={event ? `Edit ${event.nama}` : "Create Event"} />
             <div className="py-12">
