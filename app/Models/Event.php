@@ -30,9 +30,4 @@ class Event extends Model
     {
         return $this->belongsTo(Organizer::class);
     }
-
-    public function eventSubmissions() : HasMany
-    {
-        return $this->hasMany(EventSubmission::class);
-    }
 }

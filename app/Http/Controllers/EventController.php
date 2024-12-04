@@ -87,24 +87,14 @@ class EventController extends Controller
 
     public function publish(Event $event)
     {
-        $event->update(['status' => 'in_review']);
-
-        $event->eventSubmissions()->create([
-            'status_pengajuan' => 'pending',
-            'keterangan_waktu' => now(),
-        ]);
+        $event->update(['status' => 'in_review', 'alasan_penolakan' => null]);
 
         return redirect()->route('events.show', $event->id);
     }
 
     public function cancelPublish(Event $event)
     {
-        $event->update(['status' => 'draft']);
-
-        $event->eventSubmissions()->create([
-            'status_pengajuan' => 'canceled',
-            'keterangan_waktu' => now(),
-        ]);
+        $event->update(['status' => 'draft', 'alasan_penolakan' => null]);
 
         return redirect()->route('events.show', $event->id);
     }

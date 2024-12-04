@@ -30,6 +30,7 @@ class CreateUser extends Command
         $email = $this->ask('Input email');
         $pw = $this->secret('Input password');
         $name = $this->ask('Input name');
+        $role = $this->choice('Input role', ['admin', 'organizer', 'participant'], 'admin');
 
         $validator = Validator::make([
             'email' => $email,
@@ -60,6 +61,7 @@ class CreateUser extends Command
         $user->email = $email;
         $user->password = bcrypt($pw);
         $user->email_verified_at = now();
+        $user->role = $role;
         $saved = $user->save();
 
         if (!$saved) {
@@ -71,6 +73,6 @@ class CreateUser extends Command
         $this->line('email : '.$email);
         $this->line('password : '.$pw);
         $this->line('name : '.$name);
-
+        $this->line('role : '.$role);
     }
 }

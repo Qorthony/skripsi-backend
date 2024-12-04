@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'hasOrganizer' => \App\Http\Middleware\HasOrganizer::class,
+            'role' => \App\Http\Middleware\UserRole::class,
         ]);
 
         //

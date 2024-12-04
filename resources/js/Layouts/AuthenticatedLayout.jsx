@@ -25,17 +25,36 @@ export default function AuthenticatedLayout({ header, children }) {
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
+                                    href={
+                                        user.role === 'admin'
+                                            ? route('admin.index')
+                                            : route('dashboard')
+                                    }
+                                    active={route().current(
+                                        user.role === 'admin'
+                                            ? 'admin.index'
+                                            : 'dashboard',
+                                    )}
                                 >
                                     Dashboard
                                 </NavLink>
-                                <NavLink
-                                    href={route('events.index')}
+                                {user.role === 'organizer' && (
+                                    <NavLink
+                                        href={route('events.index')}
                                     active={route().current('events.index')}
                                 >
                                     Events
-                                </NavLink>
+                                    </NavLink>
+                                )}
+
+                                {user.role === 'admin' && (
+                                    <NavLink
+                                        href={route('admin.event-submission.index')}
+                                        active={route().current('admin.event-submission.index')}
+                                    >
+                                        Event Submission
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 
@@ -72,11 +91,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Profile
                                         </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('organizer.index')}
+                                        {user.role === 'organizer' && (
+                                            <Dropdown.Link
+                                                href={route('organizer.index')}
                                         >
                                             Organizer
-                                        </Dropdown.Link>
+                                            </Dropdown.Link>
+                                        )}
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"

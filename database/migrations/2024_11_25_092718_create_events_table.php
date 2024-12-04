@@ -24,6 +24,7 @@ return new class extends Migration
             $table->dateTime('jadwal_selesai');
             $table->text('deskripsi')->nullable();
             $table->string('status');
+            $table->string('alasan_penolakan')->nullable();
             $table->timestamps();
         });
     }

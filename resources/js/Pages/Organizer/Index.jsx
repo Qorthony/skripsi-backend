@@ -25,7 +25,7 @@ export default function Index({ organizer }) {
     
     if (data.newLogo instanceof File) {
         preview = URL.createObjectURL(data.newLogo);
-    } else if (data.logo.startsWith('organizer-logo')) {
+    } else if (data?.logo?.startsWith('organizer-logo')) {
         preview = `/storage/${data.logo}`;
     }
 

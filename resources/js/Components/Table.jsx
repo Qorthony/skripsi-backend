@@ -1,5 +1,5 @@
 export default function Table({
-    listAction,
+    listAction = [],
     tableHeader,
     data,
     handleRowClick
@@ -13,7 +13,9 @@ export default function Table({
                         {tableHeader.map((item, index) => (
                             <th scope="col" key={index} className="px-6 py-3">{item.label}</th>
                         ))}
-                        <th scope="col" className="px-6 py-3">Action</th>
+                        {listAction.length > 0 && ( 
+                            <th scope="col" className="px-6 py-3">Action</th>
+                        )}
                     </tr>
                 </thead>
                 <tbody>
@@ -22,11 +24,13 @@ export default function Table({
                             {tableHeader.map((header, indexColumn) => (
                                 <td onClick={() => handleRowClick(item)} key={indexColumn} className="px-6 py-4">{item[header.key]}</td>
                             ))}
-                            <td className="px-6 py-4 flex">
-                                {listAction.map((action, index) => (
+                            {listAction.length > 0 && (
+                                <td className="px-6 py-4 flex">
+                                    {listAction.map((action, index) => (
                                     <button key={index} onClick={() => action.action(item)} className="mx-1 text-blue-500 hover:text-blue-700">{action.label}</button>
-                                ))}
-                            </td>
+                                    ))}
+                                </td>
+                            )}
                         </tr>
                     ))}
                 </tbody>
