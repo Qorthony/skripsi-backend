@@ -21,12 +21,17 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role'=>'participant'
         ]);
-        return response()->json($request->all());
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['message' => 'User registered successfully', 'user' => $user, 'token' => $token], 201);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User registered successfully',
+            'user' => $user,
+            'token' => $token
+        ], 201);
     }
 
     public function login(Request $request)
@@ -38,12 +43,29 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        if (!$user || !Hash::check($request->password, $user->password) || $user->role != 'participant') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['message' => 'User logged in successfully', 'user' => $user, 'token' => $token], 200);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User logged in successfully',
+            'user' => $user,
+            'token' => $token
+        ], 200);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User logged out successfully'
+        ], 200);
     }
 }
