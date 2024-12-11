@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('jumlah_tiket');
             $table->integer('total_harga');
             $table->string('batas_waktu');
-            $table->enum('status', ['pending', 'success', 'failed']);
+            $table->enum('status', ['pending', 'payment','success', 'failed']);
             $table->string('metode_pembayaran')->nullable();
             $table->string('kode_pembayaran')->nullable();
             $table->dateTime('waktu_pembayaran')->nullable();

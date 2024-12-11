@@ -73,9 +73,38 @@ class TransactionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Transaction $transaction)
     {
-        //
+        if ($transaction->status == 'pending') {
+            $transaction->update([
+                'status' => 'payment',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Transaction already paid',
+            ], 400);
+        }
+
+        // update payment on transaction
+        DB::transaction(function () use ($request, $transaction) {
+            $transaction->update([
+                'kode_pembayaran' => $request->kode_pembayaran,
+                'metode_pembayaran' => $request->metode_pembayaran,
+                'batas_waktu' => now()->addMinutes(15),
+                'total_pembayaran' => $request->total_pembayaran,
+            ]);
+
+            $transaction->ticketIssued()->update([
+                'aktif' => true,
+            ]);
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction updated',
+            'data' => $transaction
+        ], 200);
     }
 
     /**
