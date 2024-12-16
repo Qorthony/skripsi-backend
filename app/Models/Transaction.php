@@ -19,8 +19,15 @@ class Transaction extends Model
         'status',
         'metode_pembayaran',
         'kode_pembayaran',
+        'detail_pembayaran',
         'waktu_pembayaran',
         'total_pembayaran'
+    ];
+
+    protected $casts = [
+        'batas_waktu' => 'datetime',
+        'waktu_pembayaran' => 'datetime',
+        'detail_pembayaran' => 'array'
     ];
 
     public function event()

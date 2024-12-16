@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransactionRequest;
+use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Event;
 use App\Models\TicketIssued;
 use App\Models\Transaction;
+use App\Services\Transaction\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -73,38 +75,72 @@ class TransactionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $transaction)
+    public function update(Transaction $transaction, UpdateTransactionRequest $request)
     {
-        if ($transaction->status == 'pending') {
-            $transaction->update([
-                'status' => 'payment',
-            ]);
-        } else {
+        // $ticketIssueds = [];
+        // foreach ($request->ticket_issueds as $ticket) {
+        //     $ticketIssueds[] = [
+        //     'id' => $ticket['id'],
+        //     'transaction_id'=>$transaction->id,
+        //     'user_id' => isset($ticket['pemesan']) && $ticket['pemesan'] ? $request->user()->id : null,
+        //     'email_penerima' => $ticket['email_penerima'],
+        //     'aktif' => isset($ticket['pemesan']) && $ticket['pemesan'] ? true : false,
+        //     'waktu_penerbitan' => isset($ticket['pemesan']) && $ticket['pemesan'] ? now() : null,
+        //     ];
+        // }
+        // return $ticketIssueds;
+        if ($transaction->status === 'pending') {
+            $paymentService = new PaymentService();
+        
+            $payment = $paymentService->createTransaction(
+                $transaction->id.'-'.time(), 
+                $transaction->total_harga, 
+                $request->metode_pembayaran, 
+                $transaction->ticketIssued->map(function ($ticket) {
+                    return [
+                        'id' => $ticket->id,
+                        'price' => $ticket->ticket->harga,
+                        'quantity' => 1,
+                        'name' => $ticket->ticket->nama,
+                    ];
+                })
+                ->toArray()
+            );
+            $paymentDetail = $paymentService->getPaymentDetail($request->metode_pembayaran, $payment);
+            // dd($paymentDetail);
+            // return $payment;
+
+
+            // // update payment and ticket owner
+            DB::transaction(function () use ($request, $transaction, $payment ,$paymentDetail) {
+                $transaction->update([
+                    'status' => 'payment',
+                    'kode_pembayaran' => $payment->order_id,
+                    'metode_pembayaran' => $request->metode_pembayaran,
+                    'detail_pembayaran'=>$paymentDetail,
+                    'batas_waktu' => now()->addMinutes(15),
+                    'total_pembayaran' => (int) $transaction->total_harga+5000,
+                ]);
+
+                foreach ($request->ticket_issueds as $ticket) {
+                    TicketIssued::find($ticket['id'])->update([
+                        'user_id' => isset($ticket['pemesan']) && $ticket['pemesan'] ? $request->user()->id : null,
+                        'email_penerima' => $ticket['email_penerima'],
+                    ]);
+                }
+            });
+
             return response()->json([
-                'status' => 'failed',
-                'message' => 'Transaction already paid',
-            ], 400);
+                'status' => 'success',
+                'message' => 'Transaction updated',
+                'data' => $transaction
+            ], 200);
         }
 
-        // update payment on transaction
-        DB::transaction(function () use ($request, $transaction) {
-            $transaction->update([
-                'kode_pembayaran' => $request->kode_pembayaran,
-                'metode_pembayaran' => $request->metode_pembayaran,
-                'batas_waktu' => now()->addMinutes(15),
-                'total_pembayaran' => $request->total_pembayaran,
-            ]);
-
-            $transaction->ticketIssued()->update([
-                'aktif' => true,
-            ]);
-        });
-
         return response()->json([
-            'status' => 'success',
-            'message' => 'Transaction updated',
-            'data' => $transaction
-        ], 200);
+            'status' => 'error',
+            'message' => 'Transaction already paid',
+        ], 400);
     }
 
     /**

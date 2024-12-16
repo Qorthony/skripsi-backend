@@ -28,6 +28,21 @@ class TransactionService
         return $this->clientKey;
     }
 
+    public function createTransaction($data)
+    {
+        try {
+            $transaction = Http::withHeaders([
+                'Authorization' => 'Basic ' . base64_encode($this->serverKey . ':'),
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post($this->endpoint . 'charge', $data);
+    
+            return json_decode($transaction);
+        } catch (\Throwable $th) {
+            return $th;
+        }
+    }
+
     public function getTransaction($orderId)
     {
         $transaction = Http::withHeaders([

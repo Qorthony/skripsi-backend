@@ -21,12 +21,16 @@ class UpdateTransactionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->request->all();
-        return [
-            'metode_pembayaran' => 'required|string',
-            'ticket_issued' => 'required|array',
-            'ticket_issued.*.id' => 'required|exists:ticket_issueds,id',
-            'ticket_issued.*.email_penerima' => 'required|email',
-        ];
+        if ($this->transaction->status === 'pending') {
+            return [
+                'metode_pembayaran' => 'required|string|max:50',
+                'ticket_issueds' => 'required|array|',
+                'ticket_issueds.*.id' => 'required|exists:ticket_issueds,id',
+                'ticket_issueds.*.email_penerima' => 'required|email|max:255',
+                'ticket_issueds.*.pemesan'=>'sometimes|boolean'
+            ];
+        }
+
+        return [];
     }
 }

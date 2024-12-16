@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'payment','success', 'failed']);
             $table->string('metode_pembayaran')->nullable();
             $table->string('kode_pembayaran')->nullable();
+            $table->json('detail_pembayaran')->nullable();
             $table->dateTime('waktu_pembayaran')->nullable();
             $table->integer('total_pembayaran')->nullable();
             $table->timestamps();
