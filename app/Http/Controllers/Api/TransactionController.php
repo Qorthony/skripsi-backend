@@ -70,14 +70,10 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
-        $paymentService = new PaymentService();
-
-        $paymentData = $paymentService->getTransaction($transaction->kode_pembayaran);
-
         return response()->json([
             'status' => 'success',
             'message' => 'Transaction detail',
-            'data' => $paymentData
+            'data' => $transaction
         ], 200);
     }
 
@@ -113,6 +109,20 @@ class TransactionController extends Controller
                 'message' => 'Transaction updated',
                 'data' => $transaction
             ], 200);
+        }
+
+        if ($transaction->status === 'payment') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction already in payment process',
+            ], 400);
+        }
+
+        if ($transaction->status === 'success') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction already success',
+            ], 400);
         }
 
         return response()->json([

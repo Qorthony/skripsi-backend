@@ -35,6 +35,7 @@ class TransactionService
                 'Authorization' => 'Basic ' . base64_encode($this->serverKey . ':'),
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
+                'X-Override-Notification' => config('services.midtrans.notification_url'),
             ])->post($this->endpoint . 'charge', $data);
     
             return json_decode($transaction);

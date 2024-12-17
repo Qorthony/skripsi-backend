@@ -41,6 +41,7 @@ return [
         'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
         'sandbox_endpoint' => env('MIDTRANS_SANDBOX_ENDPOINT', 'https://api.sandbox.midtrans.com/v2/'),
         'production_endpoint' => env('MIDTRANS_PRODUCTION_ENDPOINT', 'https://api.midtrans.com/v2/'),
+        'notification_url' => env('MIDTRANS_NOTIFICATION_URL'),
     ],
 
 ];

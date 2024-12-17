@@ -20,11 +20,6 @@ class PaymentNotificationController
                 'status' => 'success',
                 'waktu_pembayaran' => now(),
             ]);
-
-            $transaction->ticketIssued->update([
-                'waktu_penerbitan' => now(),
-                'aktif' => true,
-            ]);
         } else if($payload['transaction_status'] == 'expire') {
             $transaction->update([
                 'status' => 'failed',
