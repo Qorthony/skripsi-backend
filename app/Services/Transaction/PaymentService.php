@@ -102,9 +102,7 @@ class PaymentService
 
     public function getTransaction($orderId)
     {
-        $transaction = $this->transactionService->getTransaction($orderId);
-
-        return $transaction;
+        return $this->transactionService->getTransaction($orderId);
     }
 
     public function getPaymentDetail(string $paymentType, object $res)

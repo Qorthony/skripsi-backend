@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\TicketIssued;
 use App\Models\Transaction;
 use App\Services\Transaction\PaymentService;
+use App\Services\Transaction\StoreOwnerAndPaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -67,9 +68,17 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Transaction $transaction)
     {
-        //
+        $paymentService = new PaymentService();
+
+        $paymentData = $paymentService->getTransaction($transaction->kode_pembayaran);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction detail',
+            'data' => $paymentData
+        ], 200);
     }
 
     /**
@@ -90,45 +99,14 @@ class TransactionController extends Controller
         // }
         // return $ticketIssueds;
         if ($transaction->status === 'pending') {
-            $paymentService = new PaymentService();
-        
-            $payment = $paymentService->createTransaction(
-                $transaction->id.'-'.time(), 
-                $transaction->total_harga, 
+            $service = new StoreOwnerAndPaymentService();
+
+            $transaction = $service->handle(
+                $transaction, 
                 $request->metode_pembayaran, 
-                $transaction->ticketIssued->map(function ($ticket) {
-                    return [
-                        'id' => $ticket->id,
-                        'price' => $ticket->ticket->harga,
-                        'quantity' => 1,
-                        'name' => $ticket->ticket->nama,
-                    ];
-                })
-                ->toArray()
+                $request->user(), 
+                $request->ticket_issueds
             );
-            $paymentDetail = $paymentService->getPaymentDetail($request->metode_pembayaran, $payment);
-            // dd($paymentDetail);
-            // return $payment;
-
-
-            // // update payment and ticket owner
-            DB::transaction(function () use ($request, $transaction, $payment ,$paymentDetail) {
-                $transaction->update([
-                    'status' => 'payment',
-                    'kode_pembayaran' => $payment->order_id,
-                    'metode_pembayaran' => $request->metode_pembayaran,
-                    'detail_pembayaran'=>$paymentDetail,
-                    'batas_waktu' => now()->addMinutes(15),
-                    'total_pembayaran' => (int) $transaction->total_harga+5000,
-                ]);
-
-                foreach ($request->ticket_issueds as $ticket) {
-                    TicketIssued::find($ticket['id'])->update([
-                        'user_id' => isset($ticket['pemesan']) && $ticket['pemesan'] ? $request->user()->id : null,
-                        'email_penerima' => $ticket['email_penerima'],
-                    ]);
-                }
-            });
 
             return response()->json([
                 'status' => 'success',
@@ -139,7 +117,7 @@ class TransactionController extends Controller
 
         return response()->json([
             'status' => 'error',
-            'message' => 'Transaction already paid',
+            'message' => 'Transaction already updated',
         ], 400);
     }
 
