@@ -14,9 +14,18 @@ class TicketIssued extends Model
         'transaction_id',
         'ticket_id',
         'user_id',
+        'kode_tiket',
         'email_penerima',
         'waktu_penerbitan',
-        'aktif'
+        'status'
+    ];
+
+    protected $casts = [
+        'waktu_penerbitan' => 'datetime'
+    ];
+
+    protected $hidden = [
+        'kode_tiket'
     ];
 
     public function transaction()
@@ -32,5 +41,10 @@ class TicketIssued extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function resale()
+    {
+        return $this->hasOne(Resale::class);
     }
 }

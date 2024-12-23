@@ -13,6 +13,7 @@ class Transaction extends Model
     protected $fillable = [
         'event_id',
         'user_id',
+        'resale_id',
         'jumlah_tiket',
         'total_harga',
         'batas_waktu',
@@ -21,6 +22,7 @@ class Transaction extends Model
         'kode_pembayaran',
         'detail_pembayaran',
         'waktu_pembayaran',
+        'biaya_pembayaran',
         'total_pembayaran'
     ];
 
@@ -43,5 +45,10 @@ class Transaction extends Model
     public function ticketIssued()
     {
         return $this->hasMany(TicketIssued::class);
+    }
+
+    public function resale()
+    {
+        return $this->belongsTo(Resale::class);
     }
 }
