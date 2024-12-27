@@ -20,6 +20,17 @@ class PaymentNotificationController
                 'status' => 'success',
                 'waktu_pembayaran' => now(),
             ]);
+
+            // jika resale_id tidak null maka update status resale dan ticket issued
+            if ($transaction->resale_id) {
+                $transaction->resale->update([
+                    'status' => 'sold',
+                ]);
+
+                $transaction->resale->ticketIssued->update([
+                    'status' => 'sold',
+                ]);
+            }
         } else if($payload['transaction_status'] == 'expire') {
             $transaction->update([
                 'status' => 'failed',

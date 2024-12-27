@@ -21,11 +21,17 @@ class StoreTransactionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'event_id' => 'required|exists:events,id',
-            'selected_ticket' => 'required|array',
-            'selected_ticket.*.id' => 'required|exists:tickets,id',
-            'selected_ticket.*.quantity' => 'required|numeric|min:1',
-        ];
+        if ($this->request->has('ticket_source') && $this->request->get('ticket_source') === 'secondary') {
+            return [
+                'resale_id' => 'required|exists:resales,id',
+            ];
+        } else {
+            return [
+                'event_id' => 'required|exists:events,id',
+                'selected_ticket' => 'required|array',
+                'selected_ticket.*.id' => 'required|exists:tickets,id',
+                'selected_ticket.*.quantity' => 'required|numeric|min:1',
+            ];
+        }
     }
 }

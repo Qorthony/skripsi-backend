@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Event;
+use App\Models\Resale;
 use App\Models\TicketIssued;
 use App\Models\Transaction;
 use App\Services\Transaction\PaymentService;
 use App\Services\Transaction\StoreOwnerAndPaymentService;
+use App\Services\Transaction\StorePrimaryTransactionService;
+use App\Services\Transaction\StoreSecondaryTransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -28,35 +31,49 @@ class TransactionController extends Controller
      */
     public function store(StoreTransactionRequest $request)
     {
-        $event = Event::with('tickets')->find($request->event_id);
-
-        $priceTotal = 0;
-        $ticketCount = 0;
-        $ticketIds = [];
-        foreach ($request->selected_ticket as $ticket) {
-            $dbTicket = $event->tickets->where('id', $ticket['id'])->first();
-            $priceTotal += $dbTicket->harga * $ticket['quantity'];
-            $ticketCount += $ticket['quantity'];
-            // push ticket id to array based on quantity
-            for($i = 0; $i < $ticket['quantity']; $i++) {
-                $ticketIds[] = ['ticket_id' => $dbTicket->id];
+        // secondary ticket transaction
+        if ($request->has('ticket_source') && $request->get('ticket_source') === 'secondary') {
+            $resale = Resale::find($request->resale_id);
+            // tambahkan pembatasan akses bahwa user pembeli tidak sama dengan user yang menjual
+            if ($resale->ticketIssued->user_id === $request->user()->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized',
+                ], 401);
             }
+
+            // tambahkan pembatasan akses jika ada transaksi yang sudah dibuat menggunakan resale tersebut maka tidak bisa membuat transaksi baru kecuali user login sama dengan user yang di transaksi tersebut
+            if ($resale->transaction) {
+                if ($resale->transaction->user_id !== $request->user()->id) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Transaction already created',
+                    ], 400);
+                }
+
+                if ($resale->transaction->user_id === $request->user()->id) {
+                    $transaction = $resale->transaction;
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Transaction already created',
+                        'data' => $transaction
+                    ], 200);
+                }
+            }
+
+            $secondaryTransactionService = new StoreSecondaryTransactionService();
+            $transaction = $secondaryTransactionService->execute($request, $resale);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Transaction created',
+                'data' => $transaction
+            ], 201);
         }
-        
-        $transaction = DB::transaction(function () use ($request, $priceTotal, $ticketCount, $ticketIds) {
-            $transaction = Transaction::create([
-                'event_id' => $request->event_id,
-                'user_id' => $request->user()->id,
-                'jumlah_tiket' => $ticketCount,
-                'total_harga' => $priceTotal,
-                'batas_waktu' => now()->addMinutes(15),
-                'status' => 'pending',
-            ]);
 
-            $transaction->ticketIssued()->createMany($ticketIds);
-
-            return $transaction;
-        });
+        // primary ticket transaction
+        $primaryTransactionService = new StorePrimaryTransactionService();
+        $transaction = $primaryTransactionService->execute($request);
 
         return response()->json([
             'status' => 'success',
@@ -82,18 +99,6 @@ class TransactionController extends Controller
      */
     public function update(Transaction $transaction, UpdateTransactionRequest $request)
     {
-        // $ticketIssueds = [];
-        // foreach ($request->ticket_issueds as $ticket) {
-        //     $ticketIssueds[] = [
-        //     'id' => $ticket['id'],
-        //     'transaction_id'=>$transaction->id,
-        //     'user_id' => isset($ticket['pemesan']) && $ticket['pemesan'] ? $request->user()->id : null,
-        //     'email_penerima' => $ticket['email_penerima'],
-        //     'aktif' => isset($ticket['pemesan']) && $ticket['pemesan'] ? true : false,
-        //     'waktu_penerbitan' => isset($ticket['pemesan']) && $ticket['pemesan'] ? now() : null,
-        //     ];
-        // }
-        // return $ticketIssueds;
         if ($transaction->status === 'pending') {
             $service = new StoreOwnerAndPaymentService();
 
@@ -101,8 +106,15 @@ class TransactionController extends Controller
                 $transaction, 
                 $request->metode_pembayaran, 
                 $request->user(), 
-                $request->ticket_issueds
+                $request->has('ticket_issueds') ? $request->ticket_issueds : []
             );
+
+            if (!$transaction) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to create payment',
+                ], 500);
+            }
 
             return response()->json([
                 'status' => 'success',

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\PaymentNotificationController;
+use App\Http\Controllers\Api\ResaleController;
 use App\Http\Controllers\Api\TicketIssuedController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Services\Midtrans\TransactionService;
@@ -34,4 +35,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::apiResource('events', EventController::class)->only('index','show');
     Route::apiResource('transactions', TransactionController::class)->only('store','show','update');
     Route::apiResource('ticket-issued', TicketIssuedController::class)->only('index','show','update');
+    Route::apiResource('events.resales', ResaleController::class)->only('index','store','show','update','destroy');
 });

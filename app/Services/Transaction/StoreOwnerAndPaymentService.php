@@ -6,11 +6,13 @@ use App\Models\TicketIssued;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\Midtrans\TransactionService;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class StoreOwnerAndPaymentService
 {
-    public function handle(Transaction $transaction, string $metode_pembayaran, User $user, array $ticketIssueds)
+    public function handle(Transaction $transaction, string $metode_pembayaran, User $user, array $ticketIssueds=[])
     {
         $paymentService = new PaymentService();
         
@@ -18,19 +20,22 @@ class StoreOwnerAndPaymentService
             $transaction->id.'-'.time(), 
             $transaction->total_harga, 
             $metode_pembayaran, 
-            $transaction->ticketIssued->map(function ($ticket) {
+            $transaction->ticketIssued->map(function ($ticket) use ($transaction) {
                 return [
                     'id' => $ticket->id,
-                    'price' => $ticket->ticket->harga,
+                    'price' => $transaction->resale_id?$transaction->total_harga:$ticket->ticket->harga,
                     'quantity' => 1,
                     'name' => $ticket->ticket->nama,
                 ];
             })
             ->toArray()
         );
+
+        if ($payment->status_code != Response::HTTP_CREATED) {
+            return null;
+        }
         $paymentDetail = $paymentService->getPaymentDetail($metode_pembayaran, $payment);
         // dd($paymentDetail);
-        // return $payment;
 
 
         // // update payment and ticket owner
@@ -43,8 +48,14 @@ class StoreOwnerAndPaymentService
                 'metode_pembayaran' => $metode_pembayaran,
                 'detail_pembayaran'=>$paymentDetail,
                 'batas_waktu' => now()->addMinutes(15),
+                'biaya_pembayaran' => 5000,
                 'total_pembayaran' => (int) $transaction->total_harga+5000,
             ]);
+
+            // jika resale_id tidak null maka lewati proses update ticket issued
+            if ($transaction->resale_id) {
+                return;
+            }
 
             foreach ($ticketIssueds as $ticket) {
                 TicketIssued::find($ticket['id'])->update([
