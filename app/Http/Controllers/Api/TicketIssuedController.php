@@ -65,14 +65,15 @@ class TicketIssuedController extends Controller
             ], 400);
         }
 
-        if ($ticketIssued->aktif) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Ticket already activated'
-            ], 400);
-        }
-
         if ($request->input('action') == 'resale') {
+            // tambahkan aturan data request harga jual minimum 80% dari harga asli tiket dan maksimal 120% dari harga asli tiket
+            if ($request->input('harga_jual') < $ticketIssued->ticket->harga * 0.8 || $request->input('harga_jual') > $ticketIssued->ticket->harga * 1.2) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Harga jual tidak valid'
+                ], 400);
+            }
+
             DB::transaction(function () use ($ticketIssued, $request) {
                 Resale::updateOrCreate(
                     ['ticket_issued_id' => $ticketIssued->id],
@@ -94,15 +95,23 @@ class TicketIssuedController extends Controller
             ]);
         }
 
-        // $ticketIssued->kode_tiket = (string) Str::uuid();
-        // $ticketIssued->status = 'active';
-        // $ticketIssued->waktu_penerbitan = now();
-        // $ticketIssued->save();
+        // activate ticket
+        if ($ticketIssued->status == 'active') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ticket already activated'
+            ], 400);
+        }
+        
+        $ticketIssued->kode_tiket = (string) Str::uuid();
+        $ticketIssued->status = 'active';
+        $ticketIssued->waktu_penerbitan = now();
+        $ticketIssued->save();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Ticket activated',
-            // 'data' => $ticketIssued
+            'data' => $ticketIssued
         ]);
     }
 

@@ -28,7 +28,7 @@ class StoreSecondaryTransactionService
             $transaction->ticketIssued()->create([
                 'ticket_id' => $resale->ticketIssued->ticket_id,
                 'user_id' => $request->user()->id,
-                'email_penerima' => $request->email_penerima,
+                'email_penerima' => $request->user()->email,
             ]);
 
             return $transaction;
