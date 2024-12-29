@@ -43,10 +43,18 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password) || $user->role != 'participant') {
+        if (!$user || !Hash::check($request->password, $user->password) ) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        // kondisi user role hanya boleh participant atau organizer
+        if ($user->role !== 'participant' && $user->role !== 'organizer') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized role'
             ], 401);
         }
 

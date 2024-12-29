@@ -16,7 +16,9 @@ class OrganizerSeeder extends Seeder
     {
         $organizer = Organizer::all();
         // print($organizer->pluck('user_id'));
-        $users = User::whereNotIn('id', $organizer->pluck('user_id'))->get();
+        $users = User::where('role', 'organizer')
+                    ->whereNotIn('id', $organizer->pluck('user_id'))
+                    ->get();
         // print($users);
 
         foreach ($users as $key => $user) {

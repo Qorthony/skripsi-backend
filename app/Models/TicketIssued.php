@@ -47,4 +47,9 @@ class TicketIssued extends Model
     {
         return $this->hasOne(Resale::class);
     }
+
+    public function checkins()
+    {
+        return $this->hasMany(Checkin::class);
+    }
 }
