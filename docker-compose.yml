@@ -1,0 +1,42 @@
+# compose.yaml
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    volumes:
+      - ./app:/app/app
+      - ./public:/app/public
+      - ./config:/app/config
+      - ./database:/app/database
+      - ./routes:/app/routes
+      - ./resources:/app/resources
+      - ./storage:/app/storage
+      - ./.env:/app/.env
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=secret
+    depends_on:
+      - db
+  db:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    volumes:
+      - db-data:/var/lib/mysql
+volumes:
+  db-data:

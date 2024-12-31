@@ -10,4 +10,14 @@ export default defineConfig({
         }),
         react(),
     ],
+
+    server: {
+        host: '0.0.0.0', // Agar bisa diakses dari luar container
+        watch: {
+            usePolling: true, // Gunakan polling untuk file changes di Docker
+        },
+        hmr: {
+            host: 'localhost', // Pastikan sesuai dengan host Anda
+        },
+    },
 });
