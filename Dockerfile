@@ -2,6 +2,9 @@ FROM dunglas/frankenphp:php8.2-bookworm
  
 ENV SERVER_NAME="http://skripsi.qorthony.my.id"
 
+# Enable PHP production settings
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 
