@@ -1,60 +1,39 @@
-FROM dunglas/frankenphp:php8.2-alpine
+FROM dunglas/frankenphp:php8.2-bookworm
+ 
+ENV SERVER_NAME=":8080"
 
-RUN apk add --no-cache \
-    zip \
-    libzip-dev \
-    freetype \
-    libjpeg-turbo \
-    libpng \
-    freetype-dev \
-    libjpeg-turbo-dev \
-    libpng-dev \
-    nodejs \
-    npm
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN install-php-extensions \
+RUN install-php-extensions @composer \
+    gd \
     pcntl \
-	pdo_mysql \
-	gd \
-	intl \
-    imap \
-    bcmath \
-    # redis \
+    opcache \
+    pdo \
+    pdo_mysql
+
+# Install dependencies nodejs
+RUN apt-get update && apt-get install -y \
     curl \
-	ctype \
-	dom \
-    exif \
-	fileinfo \
-	filter \
-    hash \
-    iconv \
-    json \
-    mbstring \
-    mysqli \
-    mysqlnd \
-	tokenizer \
-	openssl \
-    pcre \
-	pdo \
-	session \
-    xml \
-    libxml \
-    zlib \
-	zip
+    build-essential \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-	
-COPY . /app
-
+# Verifikasi instalasi
+RUN node -v && npm -v
+ 
 WORKDIR /app
+ 
+COPY . .
+ 
+RUN composer install \
+  --ignore-platform-reqs \
+  --optimize-autoloader \
+  --prefer-dist \
+  --no-interaction \
+  --no-progress \
+  --no-scripts
 
-RUN npm install
-
-COPY start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
-
-EXPOSE 8000 5173
-
-# Default command
-CMD ["/usr/local/bin/start.sh"]
-
-# ENTRYPOINT ["php", "artisan", "octane:frankenphp"]
+RUN npm install && npm run build

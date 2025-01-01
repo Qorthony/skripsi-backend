@@ -3,7 +3,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./.docker-dev/Dockerfile.dev
     restart: unless-stopped
     ports:
       - "8000:8000"
