@@ -1,6 +1,6 @@
 FROM dunglas/frankenphp:php8.2-bookworm
  
-ENV SERVER_NAME=":8080"
+ENV SERVER_NAME="http://skripsi.qorthony.my.id"
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
