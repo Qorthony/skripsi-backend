@@ -1,6 +1,4 @@
 FROM dunglas/frankenphp:php8.2-bookworm
- 
-ENV SERVER_NAME="http://skripsi.qorthony.my.id"
 
 # Enable PHP production settings
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
@@ -30,6 +28,9 @@ RUN node -v && npm -v
 WORKDIR /app
  
 COPY . .
+
+COPY start-prod.sh /usr/local/bin/start-prod.sh
+RUN chmod +x /usr/local/bin/start-prod.sh
  
 RUN composer install \
   --ignore-platform-reqs \
@@ -40,3 +41,6 @@ RUN composer install \
   --no-scripts
 
 RUN npm install && npm run build
+
+# Default command
+CMD ["/usr/local/bin/start-prod.sh"]
