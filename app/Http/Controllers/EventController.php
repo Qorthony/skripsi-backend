@@ -81,7 +81,11 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
-        $event->delete();
+        if ($event->status == EventStatus::Draft) {
+            $event->forceDelete();
+        } else {
+            $event->delete();
+        }
 
         return redirect()->route('events.index');
     }
@@ -138,7 +142,11 @@ class EventController extends Controller
 
     public function destroyTicket(Ticket $ticket)
     {
-        $ticket->delete();
+        if ($ticket->ticketIssueds()->exists()) {
+            $ticket->delete();
+        } else {
+            $ticket->forceDelete();
+        }
 
         return redirect()->back();
     }

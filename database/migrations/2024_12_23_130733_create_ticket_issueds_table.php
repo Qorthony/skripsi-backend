@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('transaction_id')->constrained();
             $table->foreignUuid('ticket_id')->constrained();
-            $table->foreignUuid('user_id')->nullable()->constrained();
+            $table->foreignUuid('user_id')->nullable()->constrained()->nullOnDelete();
             $table->uuid('kode_tiket')->nullable()->unique();
             $table->string('email_penerima')->nullable();
             $table->dateTime('waktu_penerbitan')->nullable();

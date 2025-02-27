@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('event_id')->constrained();
+            $table->foreignUuid('event_id')->constrained()->cascadeOnDelete();
             $table->string('nama');
             $table->integer('harga');
             $table->integer('kuota');
@@ -21,6 +21,7 @@ return new class extends Migration
             $table->dateTime('waktu_tutup');
             $table->string('keterangan')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

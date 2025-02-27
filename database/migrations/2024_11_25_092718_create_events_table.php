@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('status');
             $table->string('alasan_penolakan')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

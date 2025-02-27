@@ -12,7 +12,7 @@ import DetailEventSection from "./Partials/DetailEventSection";
 export default function Show({ event, tickets }) {
     return (
         <AuthenticatedLayout
-            header={<Header event={event} />}
+            header={<Header event={event} tickets={tickets} />}
         >
             <Head title={event.nama} />
 
@@ -21,7 +21,7 @@ export default function Show({ event, tickets }) {
     );
 }
 
-const Header = ({ event }) => {
+const Header = ({ event, tickets }) => {
     const [showModal, setShowModal] = useState(false);
     const [showAfterSubmissionModal, setShowAfterSubmissionModal] = useState(false);
 
@@ -40,6 +40,9 @@ const Header = ({ event }) => {
         e.preventDefault();
         router.post(route('events.cancelPublish', event.id));
     }
+
+    console.log(tickets.length==0);
+    
 
     return (
         <div className="flex justify-between items-center">
@@ -67,9 +70,17 @@ const Header = ({ event }) => {
                         <Dropdown.Content>
                             {(event.status === 'draft' || event.status === 'rejected') && (
                                 <>
-                                    <Dropdown.Link onClick={handleSubmitEvent}>Ajukan Event</Dropdown.Link>
-                                <Dropdown.Link href={route('events.edit', event.id)}>Edit Event</Dropdown.Link>
-                                <Dropdown.Link onClick={confirmUserDeletion}>Delete Event</Dropdown.Link>
+                                    {
+                                        tickets.length != 0 &&
+                                        <Dropdown.Link onClick={handleSubmitEvent}>Ajukan Event</Dropdown.Link>
+                                    }
+                                    <Dropdown.Link href={route('events.edit', event.id)}>
+                                        {
+                                            tickets.length == 0 ?
+                                            "Buat Tiket":"Edit Event"
+                                        }
+                                    </Dropdown.Link>
+                                    <Dropdown.Link onClick={confirmUserDeletion}>Delete Event</Dropdown.Link>
                                 </>
                             )}
                             {event.status === 'in_review' && (
