@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EventStatus;
 use App\Models\Event;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -36,7 +37,7 @@ class EventController extends Controller
         ]);
 
         $validated['organizer_id'] = Auth::user()->organizer->id;
-        $validated['status'] = 'draft';
+        $validated['status'] = EventStatus::Draft;
 
         $event = Event::create($validated);
 
@@ -87,14 +88,14 @@ class EventController extends Controller
 
     public function publish(Event $event)
     {
-        $event->update(['status' => 'in_review', 'alasan_penolakan' => null]);
+        $event->update(['status' => EventStatus::InReview, 'alasan_penolakan' => null]);
 
         return redirect()->route('events.show', $event->id);
     }
 
     public function cancelPublish(Event $event)
     {
-        $event->update(['status' => 'draft', 'alasan_penolakan' => null]);
+        $event->update(['status' => EventStatus::Draft, 'alasan_penolakan' => null]);
 
         return redirect()->route('events.show', $event->id);
     }

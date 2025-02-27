@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\EventStatus;
+use App\Models\Event;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,8 +26,7 @@ class EventFactory extends Factory
             'jadwal_mulai'=>fake()->dateTimeBetween('+32 days','+33 days'),
             'jadwal_selesai' => fake()->dateTimeBetween('+34 days','+35 days'),
             'deskripsi' => fake()->paragraph(),
-            'status'=> 'publish'
-
+            'status'=> EventStatus::Published,
         ];
     }
 
