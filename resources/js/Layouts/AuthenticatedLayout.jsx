@@ -161,11 +161,37 @@ export default function AuthenticatedLayout({ header, children }) {
                 >
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
+                            href={
+                                user.role === 'admin'
+                                    ? route('admin.index')
+                                    : route('dashboard')
+                            }
+                            active={
+                                route().current(
+                                    user.role === 'admin'
+                                        ? 'admin.index'
+                                        : 'dashboard',
+                                )
+                            }
                         >
                             Dashboard
                         </ResponsiveNavLink>
+                        {user.role === 'organizer' && (
+                            <ResponsiveNavLink
+                                href={route('events.index')}
+                                active={route().current('events.index')}
+                            >
+                                Events
+                            </ResponsiveNavLink>
+                        )}
+                        {user.role === 'admin' && (
+                            <ResponsiveNavLink
+                                href={route('admin.event-submission.index')}
+                                active={route().current('admin.event-submission.index')}
+                            >
+                                Event Submission
+                            </ResponsiveNavLink>
+                        )}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
