@@ -18,6 +18,7 @@ Route::get('/', function () {
 Route::post('/midtrans/notification', [PaymentNotificationController::class, 'handleNotification']);
 
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register/verifyOtp', [AuthController::class, 'registerVerifyOtp']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/login/verifyOtp', [AuthController::class, 'loginVerifyOtp']);
 

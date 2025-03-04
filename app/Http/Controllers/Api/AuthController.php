@@ -12,29 +12,75 @@ use Illuminate\Support\Facades\Notification;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(Request $request, OtpService $otpService)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'email' => 'required|string|email|max:255',
+            // 'password' => 'required|string|min:8',
         ]);
-        
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role'=>'participant'
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && $user->email_verified_at !== null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email already registered'
+            ], 409);
+        }
+
+        $user = User::updateOrCreate(
+            ['email' => $request->email],
+            [
+                'name' => $request->name,
+                // 'password' => Hash::make($request->password),
+                'role' => 'participant'
+            ]
+        );
+
+        $otp = $otpService->generateOtp($request->email);
+
+        Notification::send($user, new SendOtp($otp));
+
+        // $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'OTP code has been sent to your email',
+            'user' => $user,
+            // 'token' => $token
+        ], 201);
+    }
+
+    public function registerVerifyOtp(Request $request, OtpService $otpService)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'otp_code' => 'required|string'
         ]);
+
+        $isOtpValid = $otpService->verifyOtp($request->email, $request->otp_code);
+
+        if (!$isOtpValid) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid OTP code'
+            ], 401);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        $user->email_verified_at = now();
+        $user->save();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'status' => 'success',
-            'message' => 'User registered successfully',
+            'message' => 'OTP code is valid',
             'user' => $user,
             'token' => $token
-        ], 201);
+        ], 200);
     }
 
     public function login(Request $request, OtpService $otpService)
