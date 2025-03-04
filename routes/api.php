@@ -19,6 +19,8 @@ Route::post('/midtrans/notification', [PaymentNotificationController::class, 'ha
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login/verifyOtp', [AuthController::class, 'loginVerifyOtp']);
+
 
 Route::get('/midtrans/transaction/{orderId}', function ($orderId) {
     $transactionService = new TransactionService();
