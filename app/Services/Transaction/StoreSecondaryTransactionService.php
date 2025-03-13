@@ -16,7 +16,7 @@ class StoreSecondaryTransactionService
             ]);
 
             $transaction = Transaction::create([
-                'event_id' => $resale->ticketIssued->ticket->event_id,
+                'event_id' => $resale->ticketIssued->transactionItem->ticket->event_id,
                 'user_id' => $request->user()->id,
                 'jumlah_tiket' => 1,
                 'total_harga' => $resale->harga_jual,
@@ -25,8 +25,16 @@ class StoreSecondaryTransactionService
                 'resale_id' => $resale->id,
             ]);
 
-            $transaction->ticketIssued()->create([
-                'ticket_id' => $resale->ticketIssued->ticket_id,
+            $items = $transaction->transactionItems()->create([
+                'ticket_id' => $resale->ticketIssued->transactionItem->ticket_id,
+                'nama' => $resale->ticketIssued->transactionItem->nama,
+                'deskripsi' => $resale->ticketIssued->transactionItem->keterangan,
+                'harga_satuan' => $resale->harga_jual,
+                'jumlah' => 1,
+                'total_harga' => $resale->harga_jual,
+            ]);
+
+            $items->ticketIssueds()->create([
                 'user_id' => $request->user()->id,
                 'email_penerima' => $request->user()->email,
             ]);

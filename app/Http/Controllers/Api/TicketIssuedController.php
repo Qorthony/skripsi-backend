@@ -19,7 +19,7 @@ class TicketIssuedController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'My Ticket Issued',
-            'data' => auth()->user()->ticketIssued()->with('ticket')->get()
+            'data' => auth()->user()->ticketIssueds()->with('ticket')->get()
         ]);
     }
 
@@ -58,7 +58,7 @@ class TicketIssuedController extends Controller
             ], 401);
         }
 
-        if ($ticketIssued->transaction->status != 'success') {
+        if ($ticketIssued->transactionItem->transaction->status != 'success') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Transaction is not success'
@@ -67,7 +67,7 @@ class TicketIssuedController extends Controller
 
         if ($request->input('action') == 'resale') {
             // tambahkan aturan data request harga jual minimum 80% dari harga asli tiket dan maksimal 120% dari harga asli tiket
-            if ($request->input('harga_jual') < $ticketIssued->ticket->harga * 0.8 || $request->input('harga_jual') > $ticketIssued->ticket->harga * 1.2) {
+            if ($request->input('harga_jual') < $ticketIssued->transactionItem->ticket->harga * 0.8 || $request->input('harga_jual') > $ticketIssued->transactionItem->ticket->harga * 1.2) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Harga jual tidak valid'
@@ -91,7 +91,7 @@ class TicketIssuedController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket on resale',
-                'data' => $ticketIssued->load(['resale','ticket'])
+                'data' => $ticketIssued->load(['resale','transactionItem.ticket'])
             ]);
         }
 

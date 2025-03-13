@@ -42,9 +42,9 @@ class Transaction extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function ticketIssued()
+    public function transactionItems()
     {
-        return $this->hasMany(TicketIssued::class);
+        return $this->hasMany(TransactionItem::class);
     }
 
     public function resale()

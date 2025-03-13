@@ -27,6 +27,18 @@ return new class extends Migration
             $table->integer('total_pembayaran')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('transaction_items', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('transaction_id')->constrained();
+            $table->foreignUuid('ticket_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('nama');
+            $table->string('deskripsi')->nullable();
+            $table->integer('harga_satuan');
+            $table->integer('jumlah');
+            $table->integer('total_harga');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -34,6 +46,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('transaction_items');
         Schema::dropIfExists('transactions');
     }
 };

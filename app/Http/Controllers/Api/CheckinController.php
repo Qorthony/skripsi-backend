@@ -16,7 +16,7 @@ class CheckinController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Checkin list',
-            'data' => TicketIssued::with(['user','ticket'])->where('status', 'checkin')->get(),
+            'data' => TicketIssued::with(['user','transactionItem.ticket'])->where('status', 'checkin')->get(),
         ]);
     }
 
@@ -51,7 +51,7 @@ class CheckinController extends Controller
         }
 
         // kondisi role user yang login harus organizer dan merupakan pembuat event
-        if (auth()->user()->role !== 'organizer' || auth()->id() !== $ticketIssued->transaction->event->organizer->user_id) {
+        if (auth()->user()->role !== 'organizer' || auth()->id() !== $ticketIssued->transactionItem->transaction->event->organizer->user_id) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized',

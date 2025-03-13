@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('ticket_issueds', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('transaction_id')->constrained();
-            $table->foreignUuid('ticket_id')->constrained();
             $table->foreignUuid('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignUuid('transaction_item_id')->constrained();
             $table->uuid('kode_tiket')->nullable()->unique();
             $table->string('email_penerima')->nullable();
             $table->dateTime('waktu_penerbitan')->nullable();

@@ -142,7 +142,7 @@ class EventController extends Controller
 
     public function destroyTicket(Ticket $ticket)
     {
-        if ($ticket->ticketIssueds()->exists()) {
+        if ($ticket->transactionItems()->exists()) {
             $ticket->delete();
         } else {
             $ticket->forceDelete();

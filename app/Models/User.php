@@ -57,7 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Organizer::class);
     }
 
-    public function ticketIssued() : HasMany
+    public function ticketIssueds() : HasMany
     {
         return $this->hasMany(TicketIssued::class);
     }

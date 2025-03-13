@@ -20,7 +20,7 @@ class StoreOwnerAndPaymentService
             $transaction->id.'-'.time(), 
             $transaction->total_harga, 
             $metode_pembayaran, 
-            $transaction->ticketIssued->map(function ($ticket) use ($transaction) {
+            $transaction->transactionItems->ticketIssueds->map(function ($ticket) use ($transaction) {
                 return [
                     'id' => $ticket->id,
                     'price' => $transaction->resale_id?$transaction->total_harga:$ticket->ticket->harga,

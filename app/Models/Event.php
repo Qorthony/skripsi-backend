@@ -48,8 +48,8 @@ class Event extends Model
         return $this->hasMany(Transaction::class);
     }
 
-    public function ticketIssueds() : HasManyThrough
+    public function transactionItems() : HasManyThrough
     {
-        return $this->hasManyThrough(TicketIssued::class, Ticket::class);
+        return $this->hasManyThrough(TransactionItem::class, Ticket::class);
     }
 }

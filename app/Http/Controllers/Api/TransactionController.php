@@ -67,7 +67,7 @@ class TransactionController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Transaction created',
-                'data' => $transaction
+                'data' => $transaction->load(['transactionItems','event'])
             ], 201);
         }
 
@@ -78,7 +78,7 @@ class TransactionController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Transaction created',
-            'data' => $transaction
+            'data' => $transaction->load(['transactionItems','event'])
         ], 201);
     }
 
@@ -90,7 +90,7 @@ class TransactionController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Transaction detail',
-            'data' => $transaction
+            'data' => $transaction->with(['event','transactionItems.ticketIssueds'])->first()
         ], 200);
     }
 

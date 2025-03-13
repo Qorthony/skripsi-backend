@@ -11,8 +11,7 @@ class TicketIssued extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'transaction_id',
-        'ticket_id',
+        'transaction_item_id',
         'user_id',
         'kode_tiket',
         'email_penerima',
@@ -28,14 +27,9 @@ class TicketIssued extends Model
         'kode_tiket'
     ];
 
-    public function transaction()
+    public function transactionItem()
     {
-        return $this->belongsTo(Transaction::class);
-    }
-
-    public function ticket()
-    {
-        return $this->belongsTo(Ticket::class);
+        return $this->belongsTo(TransactionItem::class);
     }
 
     public function user()

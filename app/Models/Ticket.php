@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ticket extends Model
@@ -27,8 +28,8 @@ class Ticket extends Model
         return $this->belongsTo(Event::class);
     }
 
-    public function ticketIssueds()
+    public function transactionItems() : HasMany
     {
-        return $this->hasMany(TicketIssued::class);
+        return $this->hasMany(TransactionItem::class);
     }
 }

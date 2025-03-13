@@ -17,9 +17,9 @@ class ResaleController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'index',
-            'data' => $event->ticketIssueds()
-                        ->with('resale')
-                        ->whereHas('resale', function($query) {
+            'data' => $event->transactionItems()
+                        ->with(['ticketIssueds', 'ticketIssueds.resale'])
+                        ->whereHas('ticketIssueds.resale', function($query) {
                             $query->where('status', 'active');
                         })
                         ->get(),
@@ -47,9 +47,9 @@ class ResaleController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'show',
-            'data' => $event->ticketIssueds()
-                        ->with(['resale', 'ticket'])
-                        ->whereHas('resale', function($query) use ($resale) {
+            'data' => $event->transactionItems()
+                        ->with(['ticketIssueds.resale', 'ticket'])
+                        ->whereHas('ticketIssueds.resale', function($query) use ($resale) {
                             $query->where('resales.id', $resale->id);
                         })
                         ->first(),
