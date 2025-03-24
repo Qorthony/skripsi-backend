@@ -10,6 +10,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
+use function Illuminate\Log\log;
+
 class StoreOwnerAndPaymentService
 {
     public function handle(Transaction $transaction, string $metode_pembayaran, User $user, array $ticketIssueds=[])
@@ -30,6 +32,8 @@ class StoreOwnerAndPaymentService
             })
             ->toArray()
         );
+
+        log('payment response', [$payment]);
 
         if ($payment->status_code != Response::HTTP_CREATED) {
             return null;
