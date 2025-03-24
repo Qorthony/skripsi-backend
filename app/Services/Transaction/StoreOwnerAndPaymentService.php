@@ -20,12 +20,12 @@ class StoreOwnerAndPaymentService
             $transaction->id.'-'.time(), 
             $transaction->total_harga, 
             $metode_pembayaran, 
-            $transaction->transactionItems->ticketIssueds->map(function ($ticket) use ($transaction) {
+            $transaction->transactionItems->map(function ($item) use ($transaction) {
                 return [
-                    'id' => $ticket->id,
-                    'price' => $transaction->resale_id?$transaction->total_harga:$ticket->ticket->harga,
-                    'quantity' => 1,
-                    'name' => $ticket->ticket->nama,
+                    'id' => $item->id,
+                    'price' => $item->harga_satuan,
+                    'quantity' => $item->jumlah,
+                    'name' => $item->nama,
                 ];
             })
             ->toArray()
