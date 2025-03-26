@@ -19,7 +19,7 @@ class TicketIssuedController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'My Ticket Issued',
-            'data' => auth()->user()->ticketIssueds()->with('ticket')->get()
+            'data' => auth()->user()->ticketIssueds()->with('transactionItem.transaction.event')->get()
         ]);
     }
 
