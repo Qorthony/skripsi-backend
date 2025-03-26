@@ -90,7 +90,7 @@ class TransactionController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Transaction detail',
-            'data' => $transaction->load(['event','transactionItems.ticketIssueds'])
+            'data' => $transaction->load(['event','transactionItems.ticketIssueds.user'])
         ], 200);
     }
 
