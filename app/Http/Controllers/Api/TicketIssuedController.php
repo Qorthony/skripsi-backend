@@ -20,9 +20,8 @@ class TicketIssuedController extends Controller
             'status' => 'success',
             'message' => 'My Ticket Issued',
             'data' => auth()->user()->ticketIssueds()
-                        ->withWhereHas('transactionItem.transaction.event',function ($query) {
-                            $query->where('transactions.status', 'success');
-                        })
+                        ->whereRelation('transactionItem.transaction', 'status', 'success')
+                        ->with('transactionItem.transaction.event')
                         ->get()
         ]);
     }
