@@ -19,7 +19,11 @@ class TicketIssuedController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'My Ticket Issued',
-            'data' => auth()->user()->ticketIssueds()->with('transactionItem.transaction.event')->get()
+            'data' => auth()->user()->ticketIssueds()
+                        ->withWhereHas('transactionItem.transaction.event',function ($query) {
+                            $query->where('transactions.status', 'success');
+                        })
+                        ->get()
         ]);
     }
 
