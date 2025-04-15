@@ -21,9 +21,34 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $request->validate([
+            'event_id' => 'nullable|exists:events,id',
+        ]);
+
+        $query = Transaction::with(['event', 'transactionItems.ticketIssueds.user']);
+
+        if ($request->user()->role === 'organizer') {
+            if (!$request->has('event_id')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Event ID is required for organizers',
+                ], 400);
+            }
+
+            $query->where('event_id', $request->get('event_id'));
+        } else {
+            $query->where('user_id', $request->user()->id);
+        }
+
+        $transactions = $query->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'List of transactions',
+            'data' => $transactions
+        ], 200);
     }
 
     /**

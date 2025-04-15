@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Resale;
+use App\Models\TicketIssued;
 use Illuminate\Http\Request;
 
 class ResaleController extends Controller
@@ -17,12 +18,17 @@ class ResaleController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'index',
-            'data' => $event->transactionItems()
-                        ->with(['ticketIssueds', 'ticketIssueds.resale'])
-                        ->whereHas('ticketIssueds.resale', function($query) {
-                            $query->where('status', 'active');
-                        })
-                        ->get(),
+            'data' => [
+                'event' => $event,
+                'resales' => TicketIssued::with(['resale', 'transactionItem'])
+                    ->whereHas('transactionItem.ticket', function($query) use ($event) {
+                        $query->where('event_id', $event->id);
+                    })
+                    ->whereHas('resale', function($query) {
+                        $query->where('status', 'active');
+                    })
+                    ->get(),
+            ],
         ]);
     }
 
@@ -69,6 +75,35 @@ class ResaleController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $resale = Resale::find($id);
+
+        if (!$resale) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Resale not found',
+            ], 404);
+        }
+
+        // Ensure the resale status is active
+        if ($resale->status !== 'active') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Resale can only be cancelled if it is active',
+            ], 400);
+        }
+
+        // Update ticket_issued status based on waktu_penerbitan
+        $ticketIssued = $resale->ticketIssued;
+        $ticketIssued->update([
+            'status' => $ticketIssued->waktu_penerbitan ? 'active' : 'inactive'
+        ]);
+
+        // Update resale status to cancelled
+        $resale->update(['status' => 'cancelled']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Resale cancelled successfully',
+        ]);
     }
 }

@@ -39,10 +39,18 @@ class TicketIssuedController extends Controller
      */
     public function show(TicketIssued $ticketIssued)
     {
+        // Validasi apakah tiket dimiliki oleh pengguna yang sedang login
+        if ($ticketIssued->user_id !== auth()->id()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'Detail Ticket Issued',
-            'data' => $ticketIssued
+            'data' => $ticketIssued->load(['transactionItem.transaction.event', 'transactionItem', 'resale', 'checkin'])
         ]);
     }
 
