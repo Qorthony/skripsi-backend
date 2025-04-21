@@ -50,7 +50,7 @@ class TicketIssuedController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Detail Ticket Issued',
-            'data' => $ticketIssued->load(['transactionItem.transaction.event', 'transactionItem', 'resale', 'checkin'])
+            'data' => $ticketIssued->load(['transactionItem.transaction.event', 'transactionItem', 'resale', 'checkins'])
         ]);
     }
 
