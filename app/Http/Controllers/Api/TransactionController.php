@@ -92,7 +92,7 @@ class TransactionController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Transaction created',
-                'data' => $transaction->load(['transactionItems','event'])
+                'data' => $transaction->load(['transactionItems.ticketIssueds','event'])
             ], 201);
         }
 
@@ -103,7 +103,7 @@ class TransactionController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Transaction created',
-            'data' => $transaction->load(['transactionItems','event'])
+            'data' => $transaction->load(['transactionItems.ticketIssueds','event'])
         ], 201);
     }
 
@@ -127,12 +127,20 @@ class TransactionController extends Controller
         if ($transaction->status === 'pending') {
             $service = new StoreOwnerAndPaymentService();
 
-            $transaction = $service->handle(
-                $transaction, 
-                $request->metode_pembayaran, 
-                $request->user(), 
-                $request->has('ticket_issueds') ? $request->ticket_issueds : []
-            );
+            if ($transaction->total_harga === 0) {
+                $transaction = $service->freeTransaction(
+                    $transaction, 
+                    $request->user(), 
+                    $request->has('ticket_issueds') ? $request->ticket_issueds : []
+                );
+            } else {
+                $transaction = $service->paidTransaction(
+                    $transaction,
+                    $request->metode_pembayaran, 
+                    $request->user(), 
+                    $request->has('ticket_issueds') ? $request->ticket_issueds : []
+                );
+            }
 
             if (!$transaction) {
                 return response()->json([

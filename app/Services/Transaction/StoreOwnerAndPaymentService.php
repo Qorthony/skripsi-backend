@@ -14,7 +14,7 @@ use function Illuminate\Log\log;
 
 class StoreOwnerAndPaymentService
 {
-    public function handle(Transaction $transaction, string $metode_pembayaran, User $user, array $ticketIssueds=[])
+    public function paidTransaction(Transaction $transaction, ?string $metode_pembayaran, User $user, array $ticketIssueds=[])
     {
         $paymentService = new PaymentService();
         
@@ -60,6 +60,28 @@ class StoreOwnerAndPaymentService
             if ($transaction->resale_id) {
                 return;
             }
+
+            foreach ($ticketIssueds as $ticket) {
+                TicketIssued::find($ticket['id'])->update([
+                    'user_id' => isset($ticket['pemesan']) && $ticket['pemesan'] ? $user->id : null,
+                    'email_penerima' => $ticket['email_penerima'],
+                ]);
+            }
+        });
+
+        return $transaction;
+    }
+
+    public function freeTransaction(Transaction $transaction, User $user, array $ticketIssueds=[])
+    {
+        DB::transaction(function () use ($transaction, $user, $ticketIssueds) {
+            // update payment and ticket owner
+            $transaction->update([
+                'status' => 'success',
+                'biaya_pembayaran' => 0,
+                'total_pembayaran' => 0,
+                'waktu_pembayaran' => now(),
+            ]);
 
             foreach ($ticketIssueds as $ticket) {
                 TicketIssued::find($ticket['id'])->update([
