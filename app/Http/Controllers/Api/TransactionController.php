@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\CheckIfTicketAvailable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
@@ -54,11 +55,23 @@ class TransactionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTransactionRequest $request)
-    {
+    public function store(
+        StoreTransactionRequest $request,
+        CheckIfTicketAvailable $checkIfTicketAvailable
+    ){
         // secondary ticket transaction
         if ($request->has('ticket_source') && $request->get('ticket_source') === 'secondary') {
             $resale = Resale::find($request->resale_id);
+
+            // if past event, return error
+            $event = Event::find($resale->ticketIssued->transactionItem->transaction->event_id);
+            if ($event->jadwal_mulai < now()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Event has passed',
+                ], 400);
+            }
+            
             // tambahkan pembatasan akses bahwa user pembeli tidak sama dengan user yang menjual
             if ($resale->ticketIssued->user_id === $request->user()->id) {
                 return response()->json([
@@ -97,6 +110,26 @@ class TransactionController extends Controller
         }
 
         // primary ticket transaction
+
+        // if past event, return error
+        $event = Event::find($request->event_id);
+        if ($event->jadwal_mulai < now()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Event has passed',
+            ], 400);
+        }
+
+        // check if the selected tickets are available (stock not empty, between waktu buka and waktu tutup)
+        $checkTicket = $checkIfTicketAvailable->handle($event, $request->selected_ticket);
+
+        if ($checkTicket['status'] === 'error') {
+            return response()->json([
+                'status' => 'error',
+                'message' => $checkTicket['message'],
+            ], 400);
+        }
+        
         $primaryTransactionService = new StorePrimaryTransactionService();
         $transaction = $primaryTransactionService->execute($request);
 
