@@ -11,12 +11,18 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $ongoing = $request->query('ongoing', false);
+        
         return response()->json([
             'status' => 'success',
             'message' => 'Event list',
-            'data' => Event::with('tickets')->get()
+            'data' => Event::with('tickets')
+                        ->when($ongoing, function ($query) {
+                            return $query->where('jadwal_mulai', '>=', now());
+                        })
+                        ->get()
         ]);
     }
 
