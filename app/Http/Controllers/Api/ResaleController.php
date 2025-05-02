@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\CancelResaleTicket;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Resale;
@@ -67,14 +68,6 @@ class ResaleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
         $resale = Resale::find($id);
 
         if (!$resale) {
@@ -84,6 +77,28 @@ class ResaleController extends Controller
             ], 404);
         }
 
+        $action = $request->query('action');
+
+        if ($action === 'cancel'){
+
+            // Cancel the resale ticket
+            $this->cancel($resale);
+
+        } elseif ($action === 'update-price') {
+
+            // Update the resale price
+            $this->updatePrice($resale, $request);
+
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid action',
+            ], 400);
+        }
+    }
+
+    private function cancel(Resale $resale)
+    {
         // Ensure the resale status is active
         if ($resale->status !== 'active') {
             return response()->json([
@@ -92,18 +107,40 @@ class ResaleController extends Controller
             ], 400);
         }
 
-        // Update ticket_issued status based on waktu_penerbitan
-        $ticketIssued = $resale->ticketIssued;
-        $ticketIssued->update([
-            'status' => $ticketIssued->waktu_penerbitan ? 'active' : 'inactive'
-        ]);
-
-        // Update resale status to cancelled
-        $resale->update(['status' => 'cancelled']);
+        // Cancel the resale
+        $cancelResaleTicket = new CancelResaleTicket();
+        $cancelResaleTicket->handle($resale);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Resale cancelled successfully',
         ]);
+    }
+
+    private function updatePrice(Resale $resale, Request $request)
+    {
+        // Validate the request data
+        $request->validate([
+            'harga' => 'required|numeric|min:0',
+        ]);
+
+        // Update the resale record
+        $resale->update([
+            'harga' => $request->harga,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Resale price updated successfully',
+            'data' => $resale,
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+
     }
 }

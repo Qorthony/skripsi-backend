@@ -405,11 +405,41 @@ Endpoint untuk mengupdate transaksi (melakukan pembayaran).
 ### Mark Transaction as Expired
 Endpoint untuk menandai transaksi sebagai expired.
 
-- **URL**: `/api/transactions/expired`
-- **Metode**: `POST`
+- **URL**: `/api/transactions/{transaction}/expire`
+- **Metode**: `PATCH`
 - **Auth Required**: Ya
 - **Headers**: `Authorization: Bearer {token}`
-- **Response**: Status transaksi yang diupdate
+- **URL Parameters**: `transaction` - ID transaksi
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Transaction marked as expired",
+    "data": {
+      "id": "uuid",
+      "user_id": "uuid",
+      "event_id": "uuid",
+      "status": "failed",
+      "batas_waktu": "timestamp",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  }
+  ```
+- **Response Error (400)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Transaction cannot be expired because it is already completed"
+  }
+  ```
+  atau
+  ```json
+  {
+    "status": "error",
+    "message": "Transaction has not yet expired"
+  }
+  ```
 
 ## Ticket Issued
 
@@ -453,7 +483,32 @@ Endpoint untuk mendapatkan daftar tiket resale untuk suatu event.
 - **Auth Required**: Ya
 - **Headers**: `Authorization: Bearer {token}`
 - **URL Parameters**: `event_id` - ID event
-- **Response**: Daftar tiket resale untuk event tersebut
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "List of resale tickets",
+    "data": [
+      {
+        "id": "uuid",
+        "ticket_issued_id": "uuid",
+        "harga": "number",
+        "status": "available",
+        "created_at": "timestamp",
+        "updated_at": "timestamp",
+        "ticket_issued": {
+          "id": "uuid",
+          "transaction_item_id": "uuid",
+          "kode_tiket": "uuid",
+          "status": "resale",
+          "created_at": "timestamp",
+          "updated_at": "timestamp",
+          "transaction_item": {...}
+        }
+      }
+    ]
+  }
+  ```
 
 ### Show Resale Detail
 Endpoint untuk mendapatkan detail tiket resale.
@@ -465,7 +520,69 @@ Endpoint untuk mendapatkan detail tiket resale.
 - **URL Parameters**: 
   - `event_id` - ID event
   - `id` - ID resale
-- **Response**: Detail tiket resale
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Resale ticket detail",
+    "data": {
+      "id": "uuid",
+      "ticket_issued_id": "uuid",
+      "harga": "number",
+      "status": "available",
+      "created_at": "timestamp",
+      "updated_at": "timestamp",
+      "ticket_issued": {
+        "id": "uuid",
+        "transaction_item_id": "uuid",
+        "kode_tiket": "uuid",
+        "status": "resale",
+        "created_at": "timestamp",
+        "updated_at": "timestamp",
+        "transaction_item": {...}
+      }
+    }
+  }
+  ```
+
+### Cancel Resale Ticket
+Endpoint untuk membatalkan tiket yang dijual kembali.
+
+- **URL**: `/api/events/{event_id}/resales/{id}/cancel`
+- **Metode**: `PATCH`
+- **Auth Required**: Ya
+- **Headers**: `Authorization: Bearer {token}`
+- **URL Parameters**: 
+  - `event_id` - ID event
+  - `id` - ID resale
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Resale ticket cancelled successfully",
+    "data": {
+      "id": "uuid",
+      "ticket_issued_id": "uuid",
+      "status": "cancelled",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  }
+  ```
+- **Response Error (403)**:
+  ```json
+  {
+    "status": "error",
+    "message": "You are not authorized to cancel this resale ticket"
+  }
+  ```
+- **Response Error (400)**:
+  ```json
+  {
+    "status": "error", 
+    "message": "This resale ticket cannot be cancelled"
+  }
+  ```
 
 ### Delete Resale
 Endpoint untuk menghapus tiket resale.
@@ -477,7 +594,13 @@ Endpoint untuk menghapus tiket resale.
 - **URL Parameters**: 
   - `event_id` - ID event
   - `id` - ID resale
-- **Response**: Konfirmasi penghapusan tiket resale
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Resale ticket deleted successfully" 
+  }
+  ```
 
 ## Checkins
 
