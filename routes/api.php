@@ -37,8 +37,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::apiResource('events', EventController::class)->only('index','show');
+
     Route::apiResource('transactions', TransactionController::class)->only('index','store','show','update');
+    Route::patch('transactions/{id}/expired', [TransactionController::class, 'expired'])->name('transactions.expired');
+
     Route::apiResource('ticket-issued', TicketIssuedController::class)->only('index','show','update');
+
+    
     Route::apiResource('events.resales', ResaleController::class)->only('index','show','destroy');
+    
     Route::apiResource('checkins', CheckinController::class)->only('index','update');
 });

@@ -183,4 +183,51 @@ class TransactionController extends Controller
     {
         //
     }
+
+    public function expired(string $id)
+    {
+        $transaction = Transaction::find($id);
+
+        if (!$transaction) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction not found',
+            ], 404);
+        }
+
+        // check if transaction pass the expired time (batas waktu field)
+        if ($transaction->status === 'success') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction already success',
+            ], 400);
+        }
+
+        if ($transaction->status === 'failed') {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Transaction already expired',
+            ], 200);
+        }
+
+        if ($transaction->status === 'pending' || $transaction->status === 'payment') {
+
+            // check if transaction pass the expired time (batas waktu field)
+            if ($transaction->batas_waktu > now()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Transaction not expired yet',
+                ], 400);
+            }
+            $transaction->update([
+                'status' => 'failed',
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Transaction expired',
+                'data' => $transaction
+            ], 200);
+        }
+
+    }
 }
