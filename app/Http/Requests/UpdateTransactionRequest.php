@@ -11,7 +11,8 @@ class UpdateTransactionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->email === $this->transaction->user->email 
+            || $this->user()->role === 'participant';
     }
 
     /**
@@ -25,7 +26,7 @@ class UpdateTransactionRequest extends FormRequest
             return [
                 'ticket_issueds' => 'required|array',
                 'ticket_issueds.*.id' => 'required|exists:ticket_issueds,id',
-                'ticket_issueds.*.email_penerima' => 'required|email|max:255',
+                'ticket_issueds.*.email_penerima' => 'required|email|distinct|max:255',
                 'ticket_issueds.*.pemesan'=>'sometimes|boolean'
             ];
         }
@@ -35,7 +36,7 @@ class UpdateTransactionRequest extends FormRequest
                 'metode_pembayaran' => 'required|string|max:50',
                 'ticket_issueds' => 'required|array|',
                 'ticket_issueds.*.id' => 'required|exists:ticket_issueds,id',
-                'ticket_issueds.*.email_penerima' => 'required|email|max:255',
+                'ticket_issueds.*.email_penerima' => 'required|email|distinct|max:255',
                 'ticket_issueds.*.pemesan'=>'sometimes|boolean'
             ];
         }

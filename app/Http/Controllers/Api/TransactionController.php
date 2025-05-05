@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\CheckIfTicketAvailable;
+use App\Actions\ValidateUniqueBookingEmail;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
@@ -148,7 +149,7 @@ class TransactionController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Transaction detail',
-            'data' => $transaction->load(['event','transactionItems.ticketIssueds.user'])
+            'data' => $transaction->load(['event','user','transactionItems.ticketIssueds.user'])
         ], 200);
     }
 
@@ -158,6 +159,17 @@ class TransactionController extends Controller
     public function update(Transaction $transaction, UpdateTransactionRequest $request)
     {
         if ($transaction->status === 'pending') {
+            // validate if booking email is unique
+            $validateUniqueBookingEmail = new ValidateUniqueBookingEmail();
+            $isValid = $validateUniqueBookingEmail->handle($request->ticket_issueds, $request->user()->email);
+            if (!$isValid) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Booking email must be unique',
+                ], 400);
+            }
+
+            // update transaction and ticket issued
             $service = new StoreOwnerAndPaymentService();
 
             if ($transaction->total_harga === 0) {

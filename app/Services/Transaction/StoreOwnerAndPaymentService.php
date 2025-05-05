@@ -84,9 +84,12 @@ class StoreOwnerAndPaymentService
             ]);
 
             foreach ($ticketIssueds as $ticket) {
+                
+                $isBookingHolder = isset($ticket['pemesan']) && $ticket['pemesan'];
+
                 TicketIssued::find($ticket['id'])->update([
-                    'user_id' => isset($ticket['pemesan']) && $ticket['pemesan'] ? $user->id : null,
-                    'email_penerima' => $ticket['email_penerima'],
+                    'user_id' => $isBookingHolder ? $user->id : null,
+                    'email_penerima' => $isBookingHolder ? $user->email : $ticket['email_penerima'],
                 ]);
             }
         });
