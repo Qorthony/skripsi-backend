@@ -44,6 +44,38 @@ class AuthController extends Controller
         ], 201);
     }
 
+    public function resendRegisterOtp(Request $request, OtpService $otpService)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email not registered'
+            ], 404);
+        }
+        if ($user->email_verified_at) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email already verified'
+            ], 409);
+        }
+
+        $otp = $otpService->generateOtp($request->email, OtpService::PURPOSE_REGISTER);
+
+        Notification::send($user, new SendOtp($otp));
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'OTP code has been resent to your email',
+            'user' => $user,
+        ], 200);
+    }
+
     public function registerVerifyOtp(RegisterVerifyOtpRequest $request, OtpService $otpService)
     {
         $isOtpValid = $request->verifyOtp($otpService);
@@ -83,6 +115,32 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'OTP code has been sent to your email',
+            'user' => $user,
+        ], 200);
+    }
+
+    public function resendLoginOtp(Request $request, OtpService $otpService)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email not registered'
+            ], 404);
+        }
+
+        $otp = $otpService->generateOtp($request->email, OtpService::PURPOSE_LOGIN);
+
+        Notification::send($user, new SendOtp($otp));
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'OTP code has been resent to your email',
             'user' => $user,
         ], 200);
     }

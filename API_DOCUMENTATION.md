@@ -48,6 +48,33 @@ Endpoint untuk mendaftarkan pengguna baru.
   }
   ```
 
+### Resend OTP for Register
+Endpoint untuk mengirim ulang kode OTP saat registrasi.
+
+- **URL**: `/api/register/resendOtp`
+- **Metode**: `POST`
+- **Auth Required**: Tidak
+- **Body Parameters**:
+  ```json
+  {
+    "email": "string, required, email format"
+  }
+  ```
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "OTP code has been sent to your email"
+  }
+  ```
+- **Response Error (404)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Email not found or already verified"
+  }
+  ```
+
 ### Verifikasi OTP Registrasi
 Endpoint untuk memverifikasi kode OTP yang dikirimkan saat registrasi.
 
@@ -126,6 +153,33 @@ Endpoint untuk login pengguna.
   {
     "status": "error",
     "message": "Unauthorized role"
+  }
+  ```
+
+### Resend OTP for Login
+Endpoint untuk mengirim ulang kode OTP saat login.
+
+- **URL**: `/api/login/resendOtp`
+- **Metode**: `POST`
+- **Auth Required**: Tidak
+- **Body Parameters**:
+  ```json
+  {
+    "email": "string, required, email format"
+  }
+  ```
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "OTP code has been sent to your email"
+  }
+  ```
+- **Response Error (404)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Email not found"
   }
   ```
 
@@ -405,11 +459,11 @@ Endpoint untuk mengupdate transaksi (melakukan pembayaran).
 ### Mark Transaction as Expired
 Endpoint untuk menandai transaksi sebagai expired.
 
-- **URL**: `/api/transactions/{transaction}/expire`
+- **URL**: `/api/transactions/{id}/expired`
 - **Metode**: `PATCH`
 - **Auth Required**: Ya
 - **Headers**: `Authorization: Bearer {token}`
-- **URL Parameters**: `transaction` - ID transaksi
+- **URL Parameters**: `id` - ID transaksi
 - **Response Success (200)**:
   ```json
   {
@@ -466,7 +520,7 @@ Endpoint untuk mendapatkan detail tiket yang diterbitkan.
 Endpoint untuk mengupdate tiket yang diterbitkan.
 
 - **URL**: `/api/ticket-issued/{id}`
-- **Metode**: `PUT`
+- **Metode**: `PUT` or `PATCH`
 - **Auth Required**: Ya
 - **Headers**: `Authorization: Bearer {token}`
 - **URL Parameters**: `id` - ID tiket
@@ -581,6 +635,33 @@ Endpoint untuk membatalkan tiket yang dijual kembali.
   {
     "status": "error", 
     "message": "This resale ticket cannot be cancelled"
+  }
+  ```
+
+### Update Resale
+Endpoint untuk mengupdate tiket resale.
+
+- **URL**: `/api/events/{event_id}/resales/{id}`
+- **Metode**: `PUT` or `PATCH`
+- **Auth Required**: Ya
+- **Headers**: `Authorization: Bearer {token}`
+- **URL Parameters**: 
+  - `event_id` - ID event
+  - `id` - ID resale
+- **Body Parameters**: Parameter update resale
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Resale ticket updated",
+    "data": {
+      "id": "uuid",
+      "ticket_issued_id": "uuid",
+      "harga": "number",
+      "status": "string",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
   }
   ```
 
