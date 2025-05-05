@@ -7,14 +7,19 @@ use Illuminate\Support\Str;
 
 class OtpService
 {
-    public function generateOtp(string $identifier, int $length = 6, int $minutes = 2): string
+    // Constants for OTP purposes
+    public const PURPOSE_LOGIN = 'login';
+    public const PURPOSE_REGISTER = 'register';
+    public const PURPOSE_RESET_PASSWORD = 'reset_password';
+
+    public function generateOtp(string $identifier, string $purpose, int $length = 6, int $minutes = 2): string
     {
         $otpCode = str_pad(mt_rand(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
-        $expiresAt = now()->addMinutes($minutes); // Masa berlaku 5 menit
+        $expiresAt = now()->addMinutes($minutes); // Masa berlaku 2 menit
 
-        // Simpan OTP ke database
+        // Simpan OTP ke database dengan purpose spesifik
         OneTimePassword::updateOrCreate(
-            ['identifier' => $identifier],
+            ['identifier' => $identifier, 'purpose' => $purpose],
             [
                 'otp_code' => $otpCode,
                 'expires_at' => $expiresAt
@@ -24,10 +29,11 @@ class OtpService
         return $otpCode;
     }
 
-    public function verifyOtp(string $identifier, string $otpCode): bool
+    public function verifyOtp(string $identifier, string $otpCode, string $purpose): bool
     {
         $otp = OneTimePassword::where('identifier', $identifier)
             ->where('otp_code', $otpCode)
+            ->where('purpose', $purpose)
             ->where('expires_at', '>=', now())
             ->first();
 
@@ -39,8 +45,14 @@ class OtpService
         return false;
     }
 
-    public function invalidateOtp(string $identifier): void
+    public function invalidateOtp(string $identifier, ?string $purpose): void
     {
-        OneTimePassword::where('identifier', $identifier)->delete();
+        $query = OneTimePassword::where('identifier', $identifier);
+        
+        if ($purpose) {
+            $query->where('purpose', $purpose);
+        }
+        
+        $query->delete();
     }
 }

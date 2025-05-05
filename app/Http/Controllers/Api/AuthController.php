@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\LoginVerifyOtpRequest;
+use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\RegisterVerifyOtpRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
@@ -12,17 +16,9 @@ use Illuminate\Support\Facades\Notification;
 
 class AuthController extends Controller
 {
-    public function register(Request $request, OtpService $otpService)
+    public function register(RegisterRequest $request, OtpService $otpService)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
-            // 'password' => 'required|string|min:8',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if ($user && $user->email_verified_at !== null) {
+        if ($request->isEmailAlreadyVerified()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Email already registered'
@@ -33,33 +29,24 @@ class AuthController extends Controller
             ['email' => $request->email],
             [
                 'name' => $request->name,
-                // 'password' => Hash::make($request->password),
                 'role' => 'participant'
             ]
         );
 
-        $otp = $otpService->generateOtp($request->email);
+        $otp = $otpService->generateOtp($request->email, OtpService::PURPOSE_REGISTER);
 
         Notification::send($user, new SendOtp($otp));
-
-        // $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'status' => 'success',
             'message' => 'OTP code has been sent to your email',
             'user' => $user,
-            // 'token' => $token
         ], 201);
     }
 
-    public function registerVerifyOtp(Request $request, OtpService $otpService)
+    public function registerVerifyOtp(RegisterVerifyOtpRequest $request, OtpService $otpService)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'otp_code' => 'required|string'
-        ]);
-
-        $isOtpValid = $otpService->verifyOtp($request->email, $request->otp_code);
+        $isOtpValid = $request->verifyOtp($otpService);
 
         if (!$isOtpValid) {
             return response()->json([
@@ -68,7 +55,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $user = $request->getUser();
 
         $user->email_verified_at = now();
         $user->save();
@@ -83,34 +70,13 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function login(Request $request, OtpService $otpService)
+    public function login(LoginRequest $request, OtpService $otpService)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            // 'password' => 'required|string',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (
-            !$user 
-            // || !Hash::check($request->password, $user->password) 
-        ) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized'
-            ], 401);
-        }
-
-        // kondisi user role hanya boleh participant atau organizer
-        if ($user->role !== 'participant' && $user->role !== 'organizer') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized role'
-            ], 401);
-        }
-
-        $otp = $otpService->generateOtp($request->email);
+        // Ambil user dari FormRequest yang sudah diquery sebelumnya
+        $user = $request->getQueriedUser();
+        
+        // Karena auth sudah dilakukan di FormRequest, kita bisa langsung lanjut ke generate OTP
+        $otp = $otpService->generateOtp($request->email, OtpService::PURPOSE_LOGIN);
 
         Notification::send($user, new SendOtp($otp));
 
@@ -121,14 +87,9 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function loginVerifyOtp(Request $request, OtpService $otpService)
+    public function loginVerifyOtp(LoginVerifyOtpRequest $request, OtpService $otpService)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'otp_code' => 'required|string'
-        ]);
-
-        $isOtpValid = $otpService->verifyOtp($request->email, $request->otp_code);
+        $isOtpValid = $otpService->verifyOtp($request->email, $request->otp_code, OtpService::PURPOSE_LOGIN);
 
         if (!$isOtpValid) {
             return response()->json([

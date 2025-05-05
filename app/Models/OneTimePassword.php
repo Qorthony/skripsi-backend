@@ -9,7 +9,7 @@ class OneTimePassword extends Model
 {
     use HasUuids;
     
-    protected $fillable = ['identifier', 'otp_code', 'expires_at'];
+    protected $fillable = ['identifier', 'otp_code', 'purpose', 'expires_at'];
     public $timestamps = true;
 
     protected $casts = [
