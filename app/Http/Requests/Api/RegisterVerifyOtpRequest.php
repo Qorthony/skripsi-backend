@@ -28,17 +28,7 @@ class RegisterVerifyOtpRequest extends FormRequest
             'otp_code' => 'required|string'
         ];
     }
-
-    /**
-     * Get the user based on the email in the request
-     * 
-     * @return User|null
-     */
-    public function getUser()
-    {
-        return User::where('email', $this->email)->first();
-    }
-
+    
     /**
      * Verify the OTP code
      * 

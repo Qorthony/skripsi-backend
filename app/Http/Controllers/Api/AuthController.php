@@ -87,7 +87,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = $request->getUser();
+        $user = User::where('email', $request->email)->first();
 
         $user->email_verified_at = now();
         $user->save();
