@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 class CancelResaleTicket
 {
-    public function handle($resale)
+    public function handle($resale):bool
     {
         DB::beginTransaction();
         try {
@@ -17,9 +17,13 @@ class CancelResaleTicket
             $this->updateResaleStatus($resale);
 
             DB::commit();
+
+            return true;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
+
+            return false;
         }
     }
 

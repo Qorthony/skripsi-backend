@@ -87,13 +87,41 @@ class ResaleController extends Controller
 
         if ($action === 'cancel'){
 
+            // Ensure the resale status is active
+            if ($resale->status !== 'active') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Resale can only be cancelled if it is active',
+                ], 400);
+            }
+
             // Cancel the resale ticket
-            $this->cancel($resale);
+            $cancelResaleTicket = new CancelResaleTicket();
+            $cancelAction = $cancelResaleTicket->handle($resale);
+            
+            if ($cancelAction) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Resale cancelled successfully',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to cancel resale',
+                ], 500);
+            }
+
 
         } elseif ($action === 'update-price') {
 
             // Update the resale price
             $this->updatePrice($resale, $request);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Resale price updated successfully',
+                'data' => $resale,
+            ]);
 
         } else {
             return response()->json([
@@ -101,26 +129,6 @@ class ResaleController extends Controller
                 'message' => 'Invalid action',
             ], 400);
         }
-    }
-
-    private function cancel(Resale $resale)
-    {
-        // Ensure the resale status is active
-        if ($resale->status !== 'active') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Resale can only be cancelled if it is active',
-            ], 400);
-        }
-
-        // Cancel the resale
-        $cancelResaleTicket = new CancelResaleTicket();
-        $cancelResaleTicket->handle($resale);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Resale cancelled successfully',
-        ]);
     }
 
     private function updatePrice(Resale $resale, Request $request)
@@ -133,12 +141,6 @@ class ResaleController extends Controller
         // Update the resale record
         $resale->update([
             'harga' => $request->harga,
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Resale price updated successfully',
-            'data' => $resale,
         ]);
     }
 
