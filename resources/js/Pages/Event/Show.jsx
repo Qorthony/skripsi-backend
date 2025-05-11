@@ -32,8 +32,12 @@ const Header = ({ event, tickets }) => {
 
     const handleSubmitEvent = (e) => {
         e.preventDefault();
-        router.post(route('events.publish', event.id));
-        setShowAfterSubmissionModal(true);
+        router.post(route('events.publish', event.id),null,{
+            onSuccess: () => {
+                setShowAfterSubmissionModal(true);
+            }
+        });
+        // setShowAfterSubmissionModal(true);
     }
 
     const handleCancelPublish = (e) => {

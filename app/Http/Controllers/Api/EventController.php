@@ -22,6 +22,7 @@ class EventController extends Controller
                         ->when($ongoing, function ($query) {
                             return $query->where('jadwal_mulai', '>=', now());
                         })
+                        ->where('status', 'published')
                         ->get()
         ]);
     }
