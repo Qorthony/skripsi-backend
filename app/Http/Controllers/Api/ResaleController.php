@@ -14,16 +14,29 @@ class ResaleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Event $event)
+    public function index()
     {
+        $event_id = request()->query('event_id');
+        if ($event_id) {
+            $event = Event::find($event_id);
+            if (!$event) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Event not found',
+                ], 404);
+            }
+        }
+        
         return response()->json([
             'status' => 'success',
             'message' => 'index',
             'data' => [
-                'event' => $event,
+                'event' => $event??null,
                 'resales' => TicketIssued::with(['resale', 'transactionItem'])
-                    ->whereHas('transactionItem.ticket', function($query) use ($event) {
-                        $query->where('event_id', $event->id);
+                    ->when($event_id, function($query) use ($event_id) {
+                        $query->whereHas('transactionItem.ticket', function($query) use ($event_id) {
+                            $query->where('event_id', $event_id);
+                        });
                     })
                     ->whereHas('resale', function($query) {
                         $query->where('status', 'active');
@@ -39,27 +52,20 @@ class ResaleController extends Controller
     public function store(Request $request)
     {
 
-        Resale::create([
-            'ticket_issued_id' => $request->ticket_issued_id,
-            'harga' => $request->harga,
-            'status' => 'active',
-        ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Event $event, Resale $resale)
+    public function show(Resale $resale)
     {
         return response()->json([
             'status' => 'success',
             'message' => 'show',
-            'data' => $event->transactionItems()
-                        ->with(['ticketIssueds.resale', 'ticket'])
-                        ->whereHas('ticketIssueds.resale', function($query) use ($resale) {
-                            $query->where('resales.id', $resale->id);
-                        })
-                        ->first(),
+            'data' => $resale->load([
+                'ticketIssued.transactionItem.ticket.event', 
+                'ticketIssued.transactionItem.transaction'
+            ]),
         ]);
     }
 
