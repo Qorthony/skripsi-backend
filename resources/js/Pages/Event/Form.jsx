@@ -2,7 +2,7 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, router, useForm } from "@inertiajs/react";
 import InputOfflineLocation from "./Partials/InputOfflineLocation";
 import dayjs from "dayjs";
 import clsx from "clsx";
@@ -11,6 +11,8 @@ import Loader from "@/Components/Loader";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TicketForm from "./Partials/TicketForm";
 import { useEffect } from "react";
+import SecondaryButton from "@/Components/SecondaryButton";
+import DangerButton from "@/Components/DangerButton";
 
 export default function Form({ event, tickets }) {
     const { data, setData, post, errors, processing } = useForm({
@@ -192,6 +194,33 @@ export default function Form({ event, tickets }) {
             {event && (
                 <TicketForm event={event} tickets={tickets} />
             )}
+
+            {
+                event && tickets.length > 0 && (
+                    <div className="pb-12">
+                        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                            <div className="overflow-hidden p-4 bg-white shadow-sm sm:rounded-lg">
+                                <section className={`space-y-6`}>
+                                    <div className="mt-4 flex justify-start space-x-2">
+                                        <PrimaryButton
+                                            onClick={()=>router.visit(route('events.show', event.id))}
+                                        >
+                                            Selesai
+                                        </PrimaryButton>
+                                        <SecondaryButton
+                                            onClick={() => router.visit(route('events.index'))}
+                                        >
+                                            Lihat events lainnya
+                                        </SecondaryButton>
+                                        
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
         </AuthenticatedLayout>
     );
 }

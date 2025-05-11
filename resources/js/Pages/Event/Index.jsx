@@ -19,14 +19,14 @@ export default function Index({ events }) {
         router.visit(route('events.edit', item.id));
     }
     const listAction = [
-        {
-            label: 'Edit',
-            action: (item) => editAction(item)
-        },
-        {
-            label: 'Delete',
-            action: (item) => deleteAction(item)
-        }
+        // {
+        //     label: 'Edit',
+        //     action: (item) => editAction(item)
+        // },
+        // {
+        //     label: 'Delete',
+        //     action: (item) => deleteAction(item)
+        // }
     ];
 
     const tableHeader = [
