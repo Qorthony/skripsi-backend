@@ -127,6 +127,42 @@ class TicketIssuedController extends Controller
     }
 
     /**
+     * Get ticket issued by id for checkin process (show info + kode_tiket)
+     */
+    public function checkin($id)
+    {
+        $ticketIssued = TicketIssued::with([
+            'transactionItem.transaction.event',
+            'transactionItem',
+            'resale',
+            'checkins',
+            'user',
+        ])->find($id);
+
+        if (!$ticketIssued) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ticket issued tidak ditemukan',
+            ], 404);
+        }
+
+        if ($ticketIssued->status !== 'active') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ticket issued tidak aktif',
+            ], 403);
+        }
+
+        $ticketIssued->makeVisible('kode_tiket');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ticket issued found',
+            'data' => $ticketIssued
+        ]);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)

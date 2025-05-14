@@ -44,8 +44,17 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::patch('transactions/{id}/expired', [TransactionController::class, 'expired'])->name('transactions.expired');
 
     Route::apiResource('ticket-issued', TicketIssuedController::class)->only('index','show','update');
+    // Get ticket issued data for checkin (by id, not kode_tiket)
+    Route::get('ticket-issued/{id}/checkin', [TicketIssuedController::class, 'checkin'])->name('ticket-issued.checkin');
     
     Route::apiResource('resales', ResaleController::class)->only('index','show','update');
     
-    Route::apiResource('checkins', CheckinController::class)->only('index','update');
+    Route::group(['prefix' => 'organizer'], function () {
+        // Organizer event management
+        Route::get('events', [\App\Http\Controllers\Api\OrganizerEventController::class, 'index']);
+        Route::get('events/{event}', [\App\Http\Controllers\Api\OrganizerEventController::class, 'show']);
+        Route::get('events/{event}/transactions', [\App\Http\Controllers\Api\OrganizerEventController::class, 'transactions']);
+        Route::get('events/{event}/participants', [\App\Http\Controllers\Api\OrganizerEventController::class, 'participants']);
+        Route::post('events/{event}/checkin', [\App\Http\Controllers\Api\OrganizerEventController::class, 'checkin']);
+    });
 });

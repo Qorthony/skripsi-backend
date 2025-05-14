@@ -122,8 +122,7 @@ Endpoint untuk login pengguna.
 - **Body Parameters**:
   ```json
   {
-    "email": "string, required, email format",
-    "as": "string, optional, nilai yang diterima: 'participant' (default) atau 'organizer'"
+    "email": "string, required, email format"
   }
   ```
 - **Response Success (200)**:
@@ -166,8 +165,7 @@ Endpoint untuk mengirim ulang kode OTP saat login.
 - **Body Parameters**:
   ```json
   {
-    "email": "string, required, email format",
-    "as": "string, optional, nilai yang diterima: 'participant' (default) atau 'organizer'"
+    "email": "string, required, email format"
   }
   ```
 - **Response Success (200)**:
@@ -529,6 +527,48 @@ Endpoint untuk mengupdate tiket yang diterbitkan.
 - **Body Parameters**: Parameter update tiket
 - **Response**: Tiket yang diupdate
 
+### Check Ticket Issued (Show Info + kode_tiket)
+Endpoint untuk menampilkan info ticket issued beserta kode_tiket berdasarkan id. Hanya ticket issued dengan status "active" yang dapat diakses.
+
+- **URL**: `/api/ticket-issued/{id}/checkin`
+- **Metode**: `GET`
+- **Auth Required**: Ya
+- **Headers**: `Authorization: Bearer {token}`
+- **URL Parameters**: `id` - ID ticket issued
+- **Response Success (200)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Ticket issued found",
+    "data": {
+      "id": "uuid",
+      "transaction_item_id": "uuid",
+      "kode_tiket": "uuid",
+      "status": "active",
+      "created_at": "timestamp",
+      "updated_at": "timestamp",
+      "transaction_item": {...},
+      "resale": {...},
+      "checkins": [...],
+      "user": {...}
+    }
+  }
+  ```
+- **Response Error (404)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Ticket issued tidak ditemukan"
+  }
+  ```
+- **Response Error (403)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Ticket issued tidak aktif"
+  }
+  ```
+
 ## Resales
 
 ### List Resales
@@ -726,6 +766,3 @@ Endpoint untuk mendapatkan informasi transaksi dari Midtrans.
 - **Auth Required**: Tidak
 - **URL Parameters**: `orderId` - ID order transaksi
 - **Response**: Data transaksi dari Midtrans
-
-
-
