@@ -20,7 +20,7 @@ class LoginRequest extends FormRequest
         $this->queriedUser = User::where('email', $this->request->get('email'))->first(); // Simpan user hasil query
         
         if ($this->queriedUser) {
-            $role = $this->request->query('as', 'participant'); // Ambil role dari request, default 'participant'
+            $role = $this->request->input('as', 'participant'); // Ambil role dari request, default 'participant'
             // kondisi user role hanya boleh participant atau organizer
             if ($role === 'participant') {
                 return $this->queriedUser->role === 'participant';

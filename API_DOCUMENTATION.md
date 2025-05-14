@@ -119,12 +119,11 @@ Endpoint untuk login pengguna.
 - **URL**: `/api/login`
 - **Metode**: `POST`
 - **Auth Required**: Tidak
-- **Query Parameters**:
-  - `as`: Role pengguna, nilai yang diterima: "participant" (default) atau "organizer"
 - **Body Parameters**:
   ```json
   {
-    "email": "string, required, email format"
+    "email": "string, required, email format",
+    "as": "string, optional, nilai yang diterima: 'participant' (default) atau 'organizer'"
   }
   ```
 - **Response Success (200)**:
@@ -164,12 +163,11 @@ Endpoint untuk mengirim ulang kode OTP saat login.
 - **URL**: `/api/login/resendOtp`
 - **Metode**: `POST`
 - **Auth Required**: Tidak
-- **Query Parameters**:
-  - `as`: Role pengguna, nilai yang diterima: "participant" (default) atau "organizer"
 - **Body Parameters**:
   ```json
   {
-    "email": "string, required, email format"
+    "email": "string, required, email format",
+    "as": "string, optional, nilai yang diterima: 'participant' (default) atau 'organizer'"
   }
   ```
 - **Response Success (200)**:
