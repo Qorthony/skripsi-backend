@@ -119,6 +119,8 @@ Endpoint untuk login pengguna.
 - **URL**: `/api/login`
 - **Metode**: `POST`
 - **Auth Required**: Tidak
+- **Query Parameters**:
+  - `as`: Role pengguna, nilai yang diterima: "participant" (default) atau "organizer"
 - **Body Parameters**:
   ```json
   {
@@ -162,6 +164,8 @@ Endpoint untuk mengirim ulang kode OTP saat login.
 - **URL**: `/api/login/resendOtp`
 - **Metode**: `POST`
 - **Auth Required**: Tidak
+- **Query Parameters**:
+  - `as`: Role pengguna, nilai yang diterima: "participant" (default) atau "organizer"
 - **Body Parameters**:
   ```json
   {
@@ -724,3 +728,6 @@ Endpoint untuk mendapatkan informasi transaksi dari Midtrans.
 - **Auth Required**: Tidak
 - **URL Parameters**: `orderId` - ID order transaksi
 - **Response**: Data transaksi dari Midtrans
+
+
+
