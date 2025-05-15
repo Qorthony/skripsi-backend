@@ -21,14 +21,17 @@ class OrganizerEventController extends Controller
         $ongoing = $request->query('ongoing');
         $organizer = $user->organizer;
 
+        
         $query = Event::where('organizer_id', $organizer->id);
+        
+        $order = 'desc';
 
         if ($ongoing) {
-            $query->where('jadwal_mulai', '<=', now())
-                  ->where('jadwal_selesai', '>=', now());
+            $query->where('jadwal_mulai', '>=', now());
+            $order = 'asc';
         }
-
-        $events = $query->with('tickets')->orderBy('created_at', 'desc')->get();
+        
+        $events = $query->with('tickets')->orderBy('jadwal_mulai', $order)->get();
         
         return response()->json(['status' => 'success', 'data' => $events]);
     }
