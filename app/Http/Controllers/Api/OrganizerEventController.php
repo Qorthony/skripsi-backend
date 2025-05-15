@@ -79,13 +79,12 @@ class OrganizerEventController extends Controller
         // Jika ada parameter pencarian
         if ($search) {
             $query->where(function($q) use ($search) {
-                // Pencarian berdasarkan data user (jika ada)
-                $q->whereHas('user', function($userQuery) use ($search) {
-                    $userQuery->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                })
                 // Pencarian berdasarkan email tiket issued
-                ->orWhere('email', 'like', "%{$search}%");
+                $q->where('email', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                  });
             });
         }
         
