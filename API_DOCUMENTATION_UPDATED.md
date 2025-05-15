@@ -207,9 +207,18 @@ Endpoint untuk memverifikasi kode OTP saat login.
       "id": "uuid",
       "name": "string",
       "email": "string",
-      "role": "string",
+      "role": "string", // "participant", "organizer", "admin"
       "created_at": "timestamp",
-      "updated_at": "timestamp"
+      "updated_at": "timestamp",
+      "organizer": { // hanya jika role = "organizer"
+        "id": "uuid",
+        "user_id": "uuid",
+        "nama": "string",
+        "deskripsi": "string",
+        "logo": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+      }
     }
   }
   ```
@@ -432,14 +441,67 @@ Endpoint untuk menampilkan info ticket issued beserta kode_tiket berdasarkan id.
     "data": {
       "id": "uuid",
       "transaction_item_id": "uuid",
-      "kode_tiket": "uuid",
+      "kode_tiket": "uuid", // kode tiket yang biasanya hidden
       "status": "active",
+      "email": "string",
+      "waktu_penerbitan": "timestamp",
       "created_at": "timestamp",
       "updated_at": "timestamp",
-      "transaction_item": {...},
-      "resale": {...},
-      "checkins": [...],
-      "user": {...}
+      "transaction_item": {
+        "id": "uuid",
+        "transaction_id": "uuid",
+        "ticket_id": "uuid",
+        "quantity": "integer",
+        "created_at": "timestamp",
+        "updated_at": "timestamp",
+        "transaction": {
+          "id": "uuid",
+          "user_id": "uuid",
+          "event_id": "uuid",
+          "status": "string",
+          "jumlah_bayar": "number",
+          "created_at": "timestamp",
+          "updated_at": "timestamp",
+          "event": {
+            "id": "uuid",
+            "organizer_id": "uuid",
+            "nama": "string",
+            "deskripsi": "string",
+            "lokasi": "string",
+            "jadwal_mulai": "datetime",
+            "jadwal_selesai": "datetime",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+          }
+        }
+      },
+      "resale": {
+        "id": "uuid",
+        "ticket_issued_id": "uuid",
+        "harga_jual": "number",
+        "status": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+      },
+      "checkins": [
+        {
+          "id": "uuid",
+          "ticket_issued_id": "uuid",
+          "user_id": "uuid",
+          "checked_in_at": "timestamp",
+          "checked_out_at": "timestamp|null",
+          "created_at": "timestamp",
+          "updated_at": "timestamp"
+        }
+      ],
+      "user": {
+        "id": "uuid",
+        "name": "string",
+        "email": "string",
+        "role": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+      }
     }
   }
   ```
@@ -499,22 +561,36 @@ Endpoint untuk mendapatkan daftar event yang dibuat oleh organizer.
 - **Metode**: `GET`
 - **Auth Required**: Ya
 - **Headers**: `Authorization: Bearer {token}`
+- **Query Parameters**:
+  - `ongoing`: Jika parameter ini ada, hanya menampilkan event yang belum dimulai dan diurutkan berdasarkan jadwal_mulai (asc)
 - **Response Success (200)**:
   ```json
   {
     "status": "success",
-    "message": "List of organizer events",
     "data": [
       {
         "id": "uuid",
+        "organizer_id": "uuid", 
         "nama": "string",
         "deskripsi": "string",
-        "tanggal_mulai": "datetime",
-        "tanggal_selesai": "datetime",
-        "status": "string",
+        "lokasi": "string",
+        "jadwal_mulai": "datetime",
+        "jadwal_selesai": "datetime",
+        "status": "string", // "draft", "published", "canceled"
         "created_at": "timestamp",
         "updated_at": "timestamp",
-        "tickets": [...]
+        "tickets": [
+          {
+            "id": "uuid",
+            "event_id": "uuid",
+            "nama": "string",
+            "deskripsi": "string",
+            "harga": "number",
+            "kuota": "integer",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+          }
+        ]
       }
     ]
   }
@@ -532,18 +608,37 @@ Endpoint untuk mendapatkan detail event yang dibuat oleh organizer.
   ```json
   {
     "status": "success",
-    "message": "Event detail",
     "data": {
       "id": "uuid",
+      "organizer_id": "uuid",
       "nama": "string",
       "deskripsi": "string",
-      "tanggal_mulai": "datetime",
-      "tanggal_selesai": "datetime",
-      "status": "string",
+      "lokasi": "string",
+      "jadwal_mulai": "datetime",
+      "jadwal_selesai": "datetime",
+      "status": "string", // "draft", "published", "canceled"
       "created_at": "timestamp",
       "updated_at": "timestamp",
-      "tickets": [...]
+      "tickets": [
+        {
+          "id": "uuid",
+          "event_id": "uuid",
+          "nama": "string",
+          "deskripsi": "string",
+          "harga": "number",
+          "kuota": "integer",
+          "created_at": "timestamp",
+          "updated_at": "timestamp"
+        }
+      ]
     }
+  }
+  ```
+- **Response Error (403)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Unauthorized" // Jika bukan organizer event ini
   }
   ```
 
@@ -555,23 +650,42 @@ Endpoint untuk mendapatkan daftar transaksi untuk event tertentu.
 - **Auth Required**: Ya
 - **Headers**: `Authorization: Bearer {token}`
 - **URL Parameters**: `event` - ID event
+- **Query Parameters**:
+  - `status` - Filter berdasarkan status transaksi (pending, success, failed, expired)
+  - `order` - Urutan berdasarkan created_at (asc, desc). Default: desc
 - **Response Success (200)**:
   ```json
   {
     "status": "success",
-    "message": "List of event transactions",
     "data": [
       {
         "id": "uuid",
         "user_id": "uuid",
-        "status": "string",
+        "status": "string", // "pending", "success", "failed", "expired"
         "jumlah_bayar": "number",
+        "kode_unik": "integer",
+        "waktu_kedaluwarsa": "datetime",
+        "snap_token": "string",
+        "snap_url": "string",
         "created_at": "timestamp",
         "updated_at": "timestamp",
-        "items": [...],
-        "user": {...}
+        "user": {
+          "id": "uuid",
+          "name": "string",
+          "email": "string",
+          "role": "string",
+          "created_at": "timestamp",
+          "updated_at": "timestamp"
+        }
       }
     ]
+  }
+  ```
+- **Response Error (403)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Unauthorized" // Jika bukan organizer event ini
   }
   ```
 
@@ -583,25 +697,93 @@ Endpoint untuk mendapatkan daftar peserta untuk event tertentu.
 - **Auth Required**: Ya
 - **Headers**: `Authorization: Bearer {token}`
 - **URL Parameters**: `event` - ID event
+- **Query Parameters**: 
+  - `search` - Pencarian berdasarkan nama user (jika tersedia), email tiket issued
 - **Response Success (200)**:
   ```json
   {
     "status": "success",
-    "message": "List of event participants",
-    "data": [
-      {
+    "data": {
+      "event": {
         "id": "uuid",
-        "transaction_item_id": "uuid",
-        "user_id": "uuid",
+        "nama": "string",
+        "deskripsi": "string",
+        "tanggal_mulai": "datetime",
+        "tanggal_selesai": "datetime",
         "status": "string",
-        "kode_tiket": "string",
         "created_at": "timestamp",
-        "updated_at": "timestamp",
-        "user": {...},
-        "ticket": {...},
-        "checkins": [...]
-      }
-    ]
+        "updated_at": "timestamp"
+      },
+      "participants": [
+        {          "id": "uuid",
+          "transaction_item_id": "uuid",
+          "user_id": "uuid",
+          "status": "string", // "inactive", "active", "resale", "checkin"
+          "kode_tiket": "string",
+          "email": "string",
+          "created_at": "timestamp",
+          "updated_at": "timestamp",
+          "user": {
+            "id": "uuid",
+            "name": "string",
+            "email": "string",
+            "role": "string",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+          },
+          "transaction_item": {
+            "id": "uuid",
+            "transaction_id": "uuid",
+            "ticket_id": "uuid",
+            "quantity": "integer",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "transaction": {
+              "id": "uuid",
+              "user_id": "uuid",
+              "status": "string",
+              "jumlah_bayar": "number",
+              "created_at": "timestamp",
+              "updated_at": "timestamp",
+              "user": {
+                "id": "uuid",
+                "name": "string",
+                "email": "string",
+                "role": "string",
+                "created_at": "timestamp",
+                "updated_at": "timestamp"
+              }
+            },
+            "ticket": {
+              "id": "uuid",
+              "event_id": "uuid",
+              "nama": "string",
+              "deskripsi": "string",
+              "harga": "number",
+              "kuota": "integer",
+              "created_at": "timestamp",
+              "updated_at": "timestamp"
+            }
+          },
+          "checkins": [
+            {
+              "id": "uuid",
+              "ticket_issued_id": "uuid",
+              "user_id": "uuid",
+              "checked_in_at": "timestamp",
+              "checked_out_at": "timestamp|null",
+              "created_at": "timestamp",
+              "updated_at": "timestamp"
+            }
+          ],
+          "created_at": "timestamp",
+          "updated_at": "timestamp",
+          "user": {...},
+          "transaction_item": {...},
+          "checkins": [...]
+        }
+      ]
+    }
   }
   ```
 
@@ -616,29 +798,50 @@ Endpoint untuk melakukan checkin peserta event.
 - **Body Parameters**:
   ```json
   {
-    "ticket_issued_id": "uuid",
-    "kode_tiket": "string"
+    "kode_tiket": "string" // kode tiket yang akan di-checkin
   }
   ```
 - **Response Success (200)**:
   ```json
   {
     "status": "success",
-    "message": "Checkin successful",
-    "data": {
-      "id": "uuid",
-      "ticket_issued_id": "uuid",
-      "waktu_checkin": "timestamp",
-      "created_at": "timestamp",
-      "updated_at": "timestamp"
-    }
+    "message": "Checkin berhasil"
   }
   ```
 - **Response Error (404)**:
   ```json
   {
     "status": "error",
-    "message": "Ticket issued tidak ditemukan"
+    "message": "Kode tiket tidak ditemukan"
+  }
+  ```
+- **Response Error (400)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Ticket not valid"
+  }
+  ```
+- **Response Error (400)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Ticket already checkin"
+  }
+  ```
+- **Response Error (403)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Unauthorized" // Jika bukan organizer event ini
+  }
+  ```
+- **Response Error (500)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Checkin gagal",
+    "error": "error message"
   }
   ```
 

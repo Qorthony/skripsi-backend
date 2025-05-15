@@ -160,6 +160,10 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        if ($user->role == 'organizer') {
+            $user->load('organizer');
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'OTP code is valid',

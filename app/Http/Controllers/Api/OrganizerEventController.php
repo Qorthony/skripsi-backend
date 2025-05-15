@@ -61,7 +61,8 @@ class OrganizerEventController extends Controller
     // 4. Daftar peserta event (berdasarkan ticket issued yang sudah selesai) beserta data checkin
     public function participants(OrganizerEventDetailRequest $request, Event $event)
     {
-        $participants = TicketIssued::whereHas('transactionItem.ticket', function ($q) use ($event) {
+        $search = $request->query('search');
+        $query = TicketIssued::whereHas('transactionItem.ticket', function ($q) use ($event) {
                 $q->where('event_id', $event->id);
             })
             ->whereHas('transactionItem.transaction', function ($q) {
@@ -73,10 +74,30 @@ class OrganizerEventController extends Controller
                 'transactionItem.ticket',
                 'checkins',
                 'user',
-            ])
-            ->get();
+            ]);
+        
+        // Jika ada parameter pencarian
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                // Pencarian berdasarkan data user (jika ada)
+                $q->whereHas('user', function($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })
+                // Pencarian berdasarkan email tiket issued
+                ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        $participants = $query->get();
             
-        return response()->json(['status' => 'success', 'data' => $participants]);
+        return response()->json([
+            'status' => 'success', 
+            'data' => [
+                'event' => $event,
+                'participants' => $participants,
+            ]
+        ]);
     }
 
     // 5. Proses checkin berdasarkan kode tiket
