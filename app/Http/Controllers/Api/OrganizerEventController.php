@@ -80,7 +80,7 @@ class OrganizerEventController extends Controller
         if ($search) {
             $query->where(function($q) use ($search) {
                 // Pencarian berdasarkan email tiket issued
-                $q->where('email', 'like', "%{$search}%")
+                $q->where('email_penerima', 'like', "%{$search}%")
                   ->orWhereHas('user', function($q) use ($search) {
                       $q->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
