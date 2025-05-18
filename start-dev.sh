@@ -6,6 +6,8 @@ until nc -z db 3306; do
   sleep 2
 done
 
+php artisan storage:link
+
 # Run database migrations
 php artisan migrate --force &
 
