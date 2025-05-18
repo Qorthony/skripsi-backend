@@ -39,6 +39,12 @@ class EventController extends Controller
         $validated['organizer_id'] = Auth::user()->organizer->id;
         $validated['status'] = EventStatus::Draft;
 
+        // Proses upload poster jika ada
+        if ($request->hasFile('poster')) {
+            $path = $request->file('poster')->store('posters', 'public');
+            $validated['poster'] = $path;
+        }
+
         $event = Event::create($validated);
 
         return redirect()->route('events.edit', $event->id);
@@ -73,6 +79,12 @@ class EventController extends Controller
             'jadwal_selesai' => 'required|date',
             'deskripsi' => 'nullable|string',
         ]);
+
+        // Proses upload poster jika ada
+        if ($request->hasFile('poster')) {
+            $path = $request->file('poster')->store('posters', 'public');
+            $validated['poster'] = $path;
+        }
 
         $event->update($validated);
 

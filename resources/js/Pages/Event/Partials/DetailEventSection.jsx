@@ -6,12 +6,24 @@ export default function DetailEventSection({ event, tickets }) {
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div className="p-6">
-                        <header>
-                            <h2 className="text-lg font-medium text-gray-900">{event.nama}</h2>
+
+                        <header className="flex flex-col items-center justify-between">
+                            <h2 className="text-2xl font-bold text-gray-800">{event.nama}</h2>
                             <p className="mt-1 w-fit text-sm text-gray-600 bg-gray-300 rounded-full px-2">
                                 {event.status}
                             </p>
                         </header>
+
+                        {/* Poster Event */}
+                        {event.poster && (
+                            <div className="mt-4 justify-center flex">
+                                <img
+                                    src={`/storage/${event.poster}`}
+                                    alt="Poster Event"
+                                    className="max-h-64 rounded shadow border"
+                                />
+                            </div>
+                        )}
 
                         {event.status === 'rejected' && (
                             <div className="mt-4 border border-gray-200 py-4 px-4 rounded-lg">

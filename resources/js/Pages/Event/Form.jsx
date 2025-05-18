@@ -10,9 +10,11 @@ import { Textarea } from "@headlessui/react";
 import Loader from "@/Components/Loader";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TicketForm from "./Partials/TicketForm";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import SecondaryButton from "@/Components/SecondaryButton";
 import DangerButton from "@/Components/DangerButton";
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '@/utils/cropImage';
 
 export default function Form({ event, tickets }) {
     const { data, setData, post, errors, processing } = useForm({
@@ -27,6 +29,14 @@ export default function Form({ event, tickets }) {
         deskripsi: event?.deskripsi ?? '',
         _method: event ? 'put' : 'post',
     });
+
+    const [posterFile, setPosterFile] = useState(null);
+    const [posterUrl, setPosterUrl] = useState(event?.poster ? `/storage/${event.poster}` : null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [showCrop, setShowCrop] = useState(false);
+    const inputFileRef = useRef();
 
     useEffect(() => {
         if (event) {
@@ -58,12 +68,31 @@ export default function Form({ event, tickets }) {
         }
     };
 
+    const onSelectPoster = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setPosterFile(file);
+            setPosterUrl(URL.createObjectURL(file));
+            setShowCrop(true);
+        }
+    };
+
+    const onCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    };
+
+    const handleCropPoster = async () => {
+        const croppedBlob = await getCroppedImg(posterUrl, croppedAreaPixels);
+        setData('poster', new File([croppedBlob], 'poster.jpg', { type: 'image/jpeg' }));
+        setPosterUrl(URL.createObjectURL(croppedBlob));
+        setShowCrop(false);
+    };
+
     return (
         <AuthenticatedLayout 
             header={<div className="text-xl font-semibold leading-tight text-gray-800">{event ? `Edit ` : "Create "}Event</div>}
         >
             <Head title={event ? `Edit ${event.nama}` : "Create Event"} />
-
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden p-4 bg-white shadow-sm sm:rounded-lg">
@@ -74,8 +103,46 @@ export default function Form({ event, tickets }) {
                                     {event ? `Edit ${event.nama} information.` : "Create your event information."}
                                 </p>
                             </header>
+                            <form onSubmit={submit} className="mt-6 space-y-6" encType="multipart/form-data">
+                                {/* Poster Upload & Crop */}
+                                <div>
+                                    <InputLabel htmlFor="poster" value="Poster Event" />
+                                    <input
+                                        id="poster"
+                                        type="file"
+                                        accept="image/*"
+                                        className="block mt-1"
+                                        ref={inputFileRef}
+                                        onChange={onSelectPoster}
+                                    />
+                                    {posterUrl && (
+                                        <div className="mt-2">
+                                            <img src={posterUrl} alt="Poster Preview" className="max-h-48 rounded" />
+                                        </div>
+                                    )}
+                                    <InputError message={errors.poster} className="mt-2" />
+                                </div>
+                                {showCrop && posterUrl && (
+                                    <>
+                                        <div className="relative w-full h-72 bg-gray-100 mt-2">
+                                            <Cropper
+                                                image={posterUrl}
+                                                crop={crop}
+                                                zoom={zoom}
+                                                aspect={4/3}
+                                                onCropChange={setCrop}
+                                                onZoomChange={setZoom}
+                                                onCropComplete={onCropComplete}
+                                            />
+                                            
+                                        </div>
+                                        <div className="flex gap-2 mt-2">
+                                            <PrimaryButton type="button" onClick={handleCropPoster}>Crop & Pakai Poster</PrimaryButton>
+                                            <SecondaryButton type="button" onClick={() => setShowCrop(false)}>Batal</SecondaryButton>
+                                        </div>
+                                    </>
+                                )}
 
-                            <form onSubmit={submit} className="mt-6 space-y-6">
                                 <div>
                                     <InputLabel htmlFor="nama" value="Nama" />
                                     <TextInput 
