@@ -13,6 +13,14 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        // Tambahan data untuk konteks project event organizer
+        'appDescription' => 'Platform manajemen event untuk penyelenggara dan peserta. Buat, kelola, dan promosikan event Anda dengan mudah.',
+        'features' => [
+            'Buat dan kelola event secara online',
+            'Manajemen tiket dan peserta',
+            'Publikasi event dan sistem verifikasi',
+            'Dashboard khusus penyelenggara',
+        ],
     ]);
 })->name('home');
 
