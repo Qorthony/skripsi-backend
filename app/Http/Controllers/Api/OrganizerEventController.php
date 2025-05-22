@@ -47,7 +47,7 @@ class OrganizerEventController extends Controller
     {
         $status = $request->query('status');
         $order = $request->query('order', 'desc');
-        $query = $event->transactions()->with('user');
+        $query = $event->transactions()->with(['user','event','transactionItems.ticket', 'transactionItems.ticketIssueds']);
 
         if ($status) {
             $query->where('status', $status);
@@ -55,7 +55,21 @@ class OrganizerEventController extends Controller
 
         $transactions = $query->orderBy('created_at', $order)->get();
         
-        return response()->json(['status' => 'success', 'data' => $transactions]);
+        // query total penghasilan dan total transaksi berhasil
+        $stats = $event->transactions()->selectRaw('sum(total_harga) as total_penghasilan, count(id) as total_tiket_terjual')
+            ->where('status', 'success')
+            ->first();
+        
+        return response()->json(
+            [
+                'status' => 'success', 
+                'data' => [
+                    'event' => $event,
+                    'stats' => $stats,
+                    'transactions' => $transactions,
+                ]
+            ]
+        );
     }
 
     // 4. Daftar peserta event (berdasarkan ticket issued yang sudah selesai) beserta data checkin
@@ -68,7 +82,7 @@ class OrganizerEventController extends Controller
             ->whereHas('transactionItem.transaction', function ($q) {
                 $q->where('status', 'success');
             })
-            ->whereIn('status', ['inactive', 'active', 'resale'])
+            ->whereIn('status', ['inactive', 'active', 'resale', 'checkin'])
             ->with([
                 'transactionItem.transaction.user',
                 'transactionItem.ticket',
@@ -89,11 +103,23 @@ class OrganizerEventController extends Controller
         }
         
         $participants = $query->get();
+
+        // Hitung total peserta dan berapa yang sudah checkin
+        $stats = TicketIssued::whereHas('transactionItem.ticket', function ($q) use ($event) {
+                $q->where('event_id', $event->id);
+            })
+            ->whereHas('transactionItem.transaction', function ($q) {
+                $q->where('status', 'success');
+            })
+            ->selectRaw('count(id) as total_peserta, count(case when status = "checkin" then 1 end) as total_checkin')
+            ->whereNot('status', 'sold')
+            ->first();
             
         return response()->json([
             'status' => 'success', 
             'data' => [
                 'event' => $event,
+                'stats' => $stats,
                 'participants' => $participants,
             ]
         ]);

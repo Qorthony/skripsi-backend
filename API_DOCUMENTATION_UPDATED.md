@@ -657,28 +657,117 @@ Endpoint untuk mendapatkan daftar transaksi untuk event tertentu.
   ```json
   {
     "status": "success",
-    "data": [
-      {
+    "data": {
+      "event": {
         "id": "uuid",
-        "user_id": "uuid",
-        "status": "string", // "pending", "success", "failed", "expired"
-        "jumlah_bayar": "number",
-        "kode_unik": "integer",
-        "waktu_kedaluwarsa": "datetime",
-        "snap_token": "string",
-        "snap_url": "string",
+        "organizer_id": "uuid",
+        "nama": "string",
+        "poster": "string|null",
+        "lokasi": "string",
+        "kota": "string",
+        "alamat_lengkap": "string",
+        "jadwal_mulai": "datetime",
+        "jadwal_selesai": "datetime",
+        "deskripsi": "string",
+        "status": "string",
+        "alasan_penolakan": "string|null",
         "created_at": "timestamp",
         "updated_at": "timestamp",
-        "user": {
+        "deleted_at": "timestamp|null"
+      },
+      "stats": {
+        "total_penghasilan": "number|string",
+        "total_tiket_terjual": "integer"
+      },
+      "transactions": [
+        {
           "id": "uuid",
-          "name": "string",
-          "email": "string",
-          "role": "string",
+          "user_id": "uuid",
+          "event_id": "uuid",
+          "jumlah_tiket": "integer",
+          "total_harga": "number",
+          "batas_waktu": "timestamp",
+          "status": "string",
+          "metode_pembayaran": "string|null",
+          "kode_pembayaran": "string|null",
+          "detail_pembayaran": {
+            "bank": "string",
+            "va_number": "string"
+          },
+          "waktu_pembayaran": "timestamp|null",
+          "biaya_pembayaran": "number|null",
+          "total_pembayaran": "number|null",
           "created_at": "timestamp",
-          "updated_at": "timestamp"
+          "updated_at": "timestamp",
+          "resale_id": "uuid|null",
+          "user": {
+            "id": "uuid",
+            "name": "string",
+            "email": "string",
+            "email_verified_at": "timestamp|null",
+            "role": "string",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+          },
+          "event": {
+            "id": "uuid",
+            "organizer_id": "uuid",
+            "nama": "string",
+            "poster": "string|null",
+            "lokasi": "string",
+            "kota": "string",
+            "alamat_lengkap": "string",
+            "jadwal_mulai": "datetime",
+            "jadwal_selesai": "datetime",
+            "deskripsi": "string",
+            "status": "string",
+            "alasan_penolakan": "string|null",
+            "created_at": "timestamp",
+            "updated_at": "timestamp",
+            "deleted_at": "timestamp|null"
+          },
+          "transaction_items": [
+            {
+              "id": "uuid",
+              "transaction_id": "uuid",
+              "ticket_id": "uuid",
+              "nama": "string",
+              "deskripsi": "string|null",
+              "harga_satuan": "number",
+              "jumlah": "integer",
+              "total_harga": "number",
+              "created_at": "timestamp",
+              "updated_at": "timestamp",
+              "ticket": {
+                "id": "uuid",
+                "event_id": "uuid",
+                "nama": "string",
+                "harga": "number",
+                "kuota": "integer",
+                "waktu_buka": "datetime|null",
+                "waktu_tutup": "datetime|null",
+                "keterangan": "string|null",
+                "created_at": "timestamp",
+                "updated_at": "timestamp",
+                "deleted_at": "timestamp|null"
+              },
+              "ticket_issueds": [
+                {
+                  "id": "uuid",
+                  "user_id": "uuid|null",
+                  "transaction_item_id": "uuid",
+                  "email_penerima": "string|null",
+                  "waktu_penerbitan": "timestamp|null",
+                  "status": "string",
+                  "created_at": "timestamp",
+                  "updated_at": "timestamp"
+                }
+              ]
+            }
+          ]
         }
-      }
-    ]
+      ]
+    }
   }
   ```
 - **Response Error (403)**:
@@ -706,49 +795,71 @@ Endpoint untuk mendapatkan daftar peserta untuk event tertentu.
     "data": {
       "event": {
         "id": "uuid",
+        "organizer_id": "uuid",
         "nama": "string",
+        "poster": "string|null",
+        "lokasi": "string",
+        "kota": "string",
+        "alamat_lengkap": "string",
+        "jadwal_mulai": "datetime",
+        "jadwal_selesai": "datetime",
         "deskripsi": "string",
-        "tanggal_mulai": "datetime",
-        "tanggal_selesai": "datetime",
         "status": "string",
+        "alasan_penolakan": "string|null",
         "created_at": "timestamp",
-        "updated_at": "timestamp"
+        "updated_at": "timestamp",
+        "deleted_at": "timestamp|null"
+      },
+      "stats": {
+        "total_peserta": "integer",
+        "total_checkin": "integer"
       },
       "participants": [
-        {          "id": "uuid",
-          "transaction_item_id": "uuid",
+        {
+          "id": "uuid",
           "user_id": "uuid",
-          "status": "string", // "inactive", "active", "resale", "checkin"
-          "kode_tiket": "string",
-          "email": "string",
+          "transaction_item_id": "uuid",
+          "email_penerima": "string",
+          "waktu_penerbitan": "timestamp|null",
+          "status": "string",
           "created_at": "timestamp",
           "updated_at": "timestamp",
-          "user": {
-            "id": "uuid",
-            "name": "string",
-            "email": "string",
-            "role": "string",
-            "created_at": "timestamp",
-            "updated_at": "timestamp"
-          },
           "transaction_item": {
             "id": "uuid",
             "transaction_id": "uuid",
             "ticket_id": "uuid",
-            "quantity": "integer",
+            "nama": "string",
+            "deskripsi": "string|null",
+            "harga_satuan": "number",
+            "jumlah": "integer",
+            "total_harga": "number",
             "created_at": "timestamp",
             "updated_at": "timestamp",
             "transaction": {
               "id": "uuid",
               "user_id": "uuid",
+              "event_id": "uuid",
+              "jumlah_tiket": "integer",
+              "total_harga": "number",
+              "batas_waktu": "timestamp",
               "status": "string",
-              "jumlah_bayar": "number",
+              "metode_pembayaran": "string|null",
+              "kode_pembayaran": "string|null",
+              "detail_pembayaran": {
+                "bank": "string",
+                "va_number": "string"
+              },
+              "waktu_pembayaran": "timestamp|null",
+              "biaya_pembayaran": "number|null",
+              "total_pembayaran": "number|null",
               "created_at": "timestamp",
               "updated_at": "timestamp",
+              "resale_id": "uuid|null",
               "user": {
                 "id": "uuid",
                 "name": "string",
                 "email": "string",
+                "email_verified_at": "timestamp|null",
                 "role": "string",
                 "created_at": "timestamp",
                 "updated_at": "timestamp"
@@ -758,11 +869,14 @@ Endpoint untuk mendapatkan daftar peserta untuk event tertentu.
               "id": "uuid",
               "event_id": "uuid",
               "nama": "string",
-              "deskripsi": "string",
               "harga": "number",
               "kuota": "integer",
+              "waktu_buka": "datetime|null",
+              "waktu_tutup": "datetime|null",
+              "keterangan": "string|null",
               "created_at": "timestamp",
-              "updated_at": "timestamp"
+              "updated_at": "timestamp",
+              "deleted_at": "timestamp|null"
             }
           },
           "checkins": [
@@ -776,14 +890,25 @@ Endpoint untuk mendapatkan daftar peserta untuk event tertentu.
               "updated_at": "timestamp"
             }
           ],
-          "created_at": "timestamp",
-          "updated_at": "timestamp",
-          "user": {...},
-          "transaction_item": {...},
-          "checkins": [...]
+          "user": {
+            "id": "uuid",
+            "name": "string",
+            "email": "string",
+            "email_verified_at": "timestamp|null",
+            "role": "string",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+          }
         }
       ]
     }
+  }
+  ```
+- **Response Error (403)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Unauthorized" // Jika bukan organizer event ini
   }
   ```
 
