@@ -50,6 +50,15 @@ const Header = ({ event }) => {
                 </>
             )}
 
+            {event.status === 'published' && (
+                <PrimaryButton
+                    onClick={() => router.visit(route('events.transactions.index', event.id))}
+                    className="ml-4"
+                >
+                    Lihat Transaksi
+                </PrimaryButton>
+            )}
+
         </div>
     );
 }

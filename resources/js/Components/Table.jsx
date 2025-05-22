@@ -22,7 +22,17 @@ export default function Table({
                     {data.map((item, index) => (
                         <tr key={index} className="bg-white border-b hover:bg-gray-50">
                             {tableHeader.map((header, indexColumn) => (
-                                <td onClick={() => handleRowClick(item)} key={indexColumn} className="px-6 py-4">{item[header.key]}</td>
+                                <td 
+                                    onClick={() => handleRowClick(item)} 
+                                    key={indexColumn} 
+                                    className={`px-6 py-4`}
+                                >
+                                    {
+                                        header.formatData?
+                                        header.formatData(parseHeaderKey(item,header.key)) 
+                                        :parseHeaderKey(item,header.key)??"-"
+                                    }
+                                </td>
                             ))}
                             {listAction.length > 0 && (
                                 <td className="px-6 py-4 flex">
@@ -37,4 +47,20 @@ export default function Table({
             </table>
         </div>
     );
+}
+
+function parseHeaderKey(data, key) {
+    const keys = key.split('.');
+    let value = data;
+
+    // Loop through the keys to access the nested property
+    for (let i = 0; i < keys.length; i++) {
+        if (value[keys[i]] !== undefined) {
+            value = value[keys[i]];
+        } else {
+            return null; // Return null if the key doesn't exist
+        }
+    }
+    
+    return value;
 }

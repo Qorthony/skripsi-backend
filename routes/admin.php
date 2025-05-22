@@ -20,5 +20,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/event-submission/{event}', [EventSubmissionController::class, 'show'])->name('admin.event-submission.show');
         Route::post('/event-submission/{event}/approve', [EventSubmissionController::class, 'approve'])->name('admin.event-submission.approve');
         Route::post('/event-submission/{event}/reject', [EventSubmissionController::class, 'reject'])->name('admin.event-submission.reject');
+        Route::get('/transactions', [\App\Http\Controllers\TransactionController::class, 'index'])->name('admin.transactions.index');
     });
 });

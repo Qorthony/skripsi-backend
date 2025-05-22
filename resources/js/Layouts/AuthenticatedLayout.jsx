@@ -55,6 +55,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Event Submission
                                     </NavLink>
                                 )}
+                                {user.role === 'admin' && (
+                                    <NavLink
+                                        href={route('admin.transactions.index')}
+                                        active={route().current('admin.transactions.index')}
+                                    >
+                                        Transactions
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 
@@ -190,6 +198,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                 active={route().current('admin.event-submission.index')}
                             >
                                 Event Submission
+                            </ResponsiveNavLink>
+                        )}
+                        {user.role === 'admin' && (
+                            <ResponsiveNavLink
+                                href={route('admin.transactions.index')}
+                                active={route().current('admin.transactions.index')}
+                            >
+                                Transaksi
                             </ResponsiveNavLink>
                         )}
                     </div>
