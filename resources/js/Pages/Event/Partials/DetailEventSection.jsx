@@ -18,7 +18,7 @@ export default function DetailEventSection({ event, tickets }) {
                         {event.poster && (
                             <div className="mt-4 justify-center flex">
                                 <img
-                                    src={`/storage/${event.poster}`}
+                                    src={event.poster}
                                     alt="Poster Event"
                                     className="max-h-64 rounded shadow border"
                                 />

@@ -31,7 +31,7 @@ export default function Form({ event, tickets }) {
     });
 
     const [posterFile, setPosterFile] = useState(null);
-    const [posterUrl, setPosterUrl] = useState(event?.poster ? `/storage/${event.poster}` : null);
+    const [posterUrl, setPosterUrl] = useState(event?.poster ? event.poster : null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
