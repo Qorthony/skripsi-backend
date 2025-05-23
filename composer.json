@@ -16,6 +16,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "laravel/vapor-core": "^2.37",
+        "league/flysystem-aws-s3-v3": "^3.0",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
