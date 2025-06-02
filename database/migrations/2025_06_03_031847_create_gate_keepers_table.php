@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('collaborators', function (Blueprint $table) {
+        Schema::create('gate_keepers', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('event_id');
             $table->string('nama');
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('collaborators');
+        Schema::dropIfExists('gate_keepers');
     }
 };

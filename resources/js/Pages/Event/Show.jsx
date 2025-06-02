@@ -120,14 +120,20 @@ const Header = ({ event, tickets }) => {
                     }
                 >
                     Lihat Transaksi
-                </PrimaryButton>
-                {
+                </PrimaryButton>                {
                     user?.role === 'organizer' && (
-                        <PrimaryButton
-                            onClick={() => router.visit(route('events.collaborators.index', event.id))}
-                        >
-                            Kelola Kolaborator
-                        </PrimaryButton>
+                        <>
+                            <PrimaryButton
+                                onClick={() => router.visit(route('events.collaborators.index', event.id))}
+                            >
+                                Kelola Kolaborator
+                            </PrimaryButton>
+                            <PrimaryButton
+                                onClick={() => router.visit(route('events.gatekeepers.index', event.id))}
+                            >
+                                Kelola Gate Keeper
+                            </PrimaryButton>
+                        </>
                     )
                 }
             </div>

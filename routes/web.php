@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CollaboratorController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\GateKeeperController;
 use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
@@ -73,6 +74,14 @@ Route::group([
         Route::get('/events/{event}/collaborators/{collaborator}/edit', [CollaboratorController::class, 'edit'])->name('events.collaborators.edit');
         Route::put('/events/{event}/collaborators/{collaborator}', [CollaboratorController::class, 'update'])->name('events.collaborators.update');
         Route::delete('/events/{event}/collaborators/{collaborator}', [CollaboratorController::class, 'destroy'])->name('events.collaborators.destroy');
+
+        // GateKeeper routes
+        Route::get('/events/{event}/gatekeepers', [GateKeeperController::class, 'index'])->name('events.gatekeepers.index');
+        Route::get('/events/{event}/gatekeepers/create', [GateKeeperController::class, 'create'])->name('events.gatekeepers.create');
+        Route::post('/events/{event}/gatekeepers', [GateKeeperController::class, 'store'])->name('events.gatekeepers.store');
+        Route::get('/events/{event}/gatekeepers/{gatekeeper}/edit', [GateKeeperController::class, 'edit'])->name('events.gatekeepers.edit');
+        Route::put('/events/{event}/gatekeepers/{gatekeeper}', [GateKeeperController::class, 'update'])->name('events.gatekeepers.update');
+        Route::delete('/events/{event}/gatekeepers/{gatekeeper}', [GateKeeperController::class, 'destroy'])->name('events.gatekeepers.destroy');
     });
 });
 

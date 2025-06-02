@@ -66,4 +66,9 @@ class Event extends Model
     {
         return $this->hasMany(Collaborator::class);
     }
+
+    public function gateKeepers() : HasMany
+    {
+        return $this->hasMany(GateKeeper::class);
+    }
 }

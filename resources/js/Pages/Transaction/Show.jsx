@@ -2,7 +2,7 @@ import Container from '@/Components/Container';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
 
-export default function TransactionShow({ event,transaction }) {
+export default function TransactionShow({ transaction }) {
     const collaborator = usePage().props.collaborator;
 
     const statusClass = {
@@ -23,7 +23,7 @@ export default function TransactionShow({ event,transaction }) {
                         <div className="mb-2"><b className='text-gray-500'>ID:</b> {transaction.id}</div>
                         <div className="mb-2">
                             <b className='text-gray-500'>Event:</b> 
-                            <a href={collaborator?route('events.show.collaborator', {event:event.id, access_code:collaborator.kode_akses}) : route('events.show', event.id)} className='text-blue-600 hover:underline'>
+                            <a href={collaborator?route('events.show.collaborator', {event:transaction.event_id, access_code:collaborator.kode_akses}) : route('events.show', transaction.event_id)} className='text-blue-600 hover:underline'>
                                 {transaction.event?.nama}
                             </a> 
                         </div>
