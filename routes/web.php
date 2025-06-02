@@ -75,6 +75,7 @@ Route::group([
         Route::get('/events/{event}/collaborators/{collaborator}/edit', [CollaboratorController::class, 'edit'])->name('events.collaborators.edit');
         Route::put('/events/{event}/collaborators/{collaborator}', [CollaboratorController::class, 'update'])->name('events.collaborators.update');
         Route::delete('/events/{event}/collaborators/{collaborator}', [CollaboratorController::class, 'destroy'])->name('events.collaborators.destroy');
+        Route::post('/events/{event}/collaborators/{collaborator}/resend-invitation', [CollaboratorController::class, 'resendInvitation'])->name('events.collaborators.resend-invitation');
 
         // GateKeeper routes
         Route::get('/events/{event}/gatekeepers', [GateKeeperController::class, 'index'])->name('events.gatekeepers.index');

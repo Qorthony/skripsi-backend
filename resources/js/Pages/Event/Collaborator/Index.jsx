@@ -6,10 +6,32 @@ import { Head, router } from "@inertiajs/react";
 
 export default function Index({ event, collaborators }) {
     console.log('collaborators:', collaborators);
-    
-    const tableHeader = [
+      const tableHeader = [
         { label: 'Nama', key: 'nama' },
         { label: 'Email', key: 'email' },
+        { 
+            label: 'Kode Akses', 
+            key: 'kode_akses',
+            formatData: (value) => (
+                <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                    {value.substring(0, 8)}...
+                </span>
+            )
+        },
+        { 
+            label: 'Link Akses', 
+            key: 'access_link',
+            formatData: (value) => (
+                <a 
+                    href={value} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 text-sm"
+                >
+                    Buka Link
+                </a>
+            )
+        },
     ];
 
     const handleEdit = (collaborator) => {
@@ -22,16 +44,26 @@ export default function Index({ event, collaborators }) {
                 preserveScroll: true,
             });
         }
+    };    const handleAccess = (collaborator) => {
+        router.visit(collaborator.access_link);
     };
 
-    const handleAccess = (collaborator) => {
-        router.visit(collaborator.access_link);
+    const handleResendInvitation = (collaborator) => {
+        if (confirm('Kirim ulang email undangan ke ' + collaborator.email + '?')) {
+            router.post(route('events.collaborators.resend-invitation', [event.id, collaborator.id]), {}, {
+                preserveScroll: true,
+            });
+        }
     };
 
     const rowActions = [
         {
             label: 'Akses',
             action: handleAccess,
+        },
+        {
+            label: 'Kirim Ulang Email',
+            action: handleResendInvitation,
         },
         {
             label: 'Edit',
