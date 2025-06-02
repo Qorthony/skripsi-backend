@@ -120,7 +120,15 @@ const Header = ({ event, tickets }) => {
                     }
                 >
                     Lihat Transaksi
-                </PrimaryButton>                {
+                </PrimaryButton>
+                <PrimaryButton
+                    onClick={() => collaborator?
+                        router.visit(route('events.attendance.index.collaborator', { event: event.id, access_code: collaborator.kode_akses }))  
+                        : router.visit(route('events.attendance.index', event.id))}
+                >
+                    Daftar Kehadiran
+                </PrimaryButton>                
+                {
                     user?.role === 'organizer' && (
                         <>
                             <PrimaryButton
@@ -133,6 +141,7 @@ const Header = ({ event, tickets }) => {
                             >
                                 Kelola Gate Keeper
                             </PrimaryButton>
+                            
                         </>
                     )
                 }

@@ -71,4 +71,11 @@ class Event extends Model
     {
         return $this->hasMany(GateKeeper::class);
     }
+
+    public function ticketIssued() : HasManyThrough
+    {
+        return $this->hasManyThrough(TicketIssued::class, TransactionItem::class, 'ticket_id', 'transaction_item_id', 'id', 'id')
+                    ->join('tickets', 'transaction_items.ticket_id', '=', 'tickets.id')
+                    ->where('tickets.event_id', $this->id);
+    }
 }

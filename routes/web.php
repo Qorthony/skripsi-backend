@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CollaboratorController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GateKeeperController;
@@ -82,6 +83,12 @@ Route::group([
         Route::get('/events/{event}/gatekeepers/{gatekeeper}/edit', [GateKeeperController::class, 'edit'])->name('events.gatekeepers.edit');
         Route::put('/events/{event}/gatekeepers/{gatekeeper}', [GateKeeperController::class, 'update'])->name('events.gatekeepers.update');
         Route::delete('/events/{event}/gatekeepers/{gatekeeper}', [GateKeeperController::class, 'destroy'])->name('events.gatekeepers.destroy');
+
+        // Attendance routes
+        Route::get('/events/{event}/attendance', [AttendanceController::class, 'index'])->name('events.attendance.index');
+        // Route::post('/events/{event}/attendance/{ticketIssued}/checkin', [AttendanceController::class, 'checkin'])->name('events.attendance.checkin');
+        // Route::post('/events/{event}/attendance/{ticketIssued}/checkout', [AttendanceController::class, 'checkout'])->name('events.attendance.checkout');
+        // Route::get('/events/{event}/attendance/{ticketIssued}/history', [AttendanceController::class, 'history'])->name('events.attendance.history');
     });
 });
 
@@ -103,6 +110,7 @@ Route::middleware(['collaborator'])
         Route::get('/', [EventController::class, 'show'])->name('events.show.collaborator');
         Route::get('/transactions', [TransactionController::class, 'byEvent'])->name('events.transactions.index.collaborator');
         Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show.collaborator');
+        Route::get('/attendance', [AttendanceController::class, 'index'])->name('events.attendance.index.collaborator');
     });
 
 require __DIR__.'/auth.php';
