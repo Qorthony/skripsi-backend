@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CollaboratorController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\ProfileController;
@@ -64,6 +65,14 @@ Route::group([
         Route::put('/events/ticket/{ticket}', [EventController::class, 'updateTicket'])->name('events.ticket.update');
 
         Route::delete('/events/ticket/{ticket}', [EventController::class, 'destroyTicket'])->name('events.ticket.destroy');
+
+        // Collaborator routes
+        Route::get('/events/{event}/collaborators', [CollaboratorController::class, 'index'])->name('events.collaborators.index');
+        Route::get('/events/{event}/collaborators/create', [CollaboratorController::class, 'create'])->name('events.collaborators.create');
+        Route::post('/events/{event}/collaborators', [CollaboratorController::class, 'store'])->name('events.collaborators.store');
+        Route::get('/events/{event}/collaborators/{collaborator}/edit', [CollaboratorController::class, 'edit'])->name('events.collaborators.edit');
+        Route::put('/events/{event}/collaborators/{collaborator}', [CollaboratorController::class, 'update'])->name('events.collaborators.update');
+        Route::delete('/events/{event}/collaborators/{collaborator}', [CollaboratorController::class, 'destroy'])->name('events.collaborators.destroy');
     });
 });
 

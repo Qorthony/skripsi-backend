@@ -61,4 +61,9 @@ class Event extends Model
     {
         return $this->hasManyThrough(TransactionItem::class, Ticket::class);
     }
+
+    public function collaborators() : HasMany
+    {
+        return $this->hasMany(Collaborator::class);
+    }
 }

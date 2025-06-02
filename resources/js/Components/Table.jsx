@@ -4,6 +4,7 @@ export default function Table({
     data,
     handleRowClick
 }) {
+    
 
     return (
         <div className="overflow-x-auto">
@@ -19,7 +20,17 @@ export default function Table({
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((item, index) => (
+                    {
+                        data.length === 0 && (
+                            <tr>
+                                <td colSpan={tableHeader.length + (listAction.length > 0 ? 1 : 0)} className="text-center py-4">
+                                    Tidak ada data yang tersedia.
+                                </td>
+                            </tr>
+                        )
+                    }
+
+                    {data.length !==0 && data.map((item, index) => (
                         <tr key={index} className="bg-white border-b hover:bg-gray-50">
                             {tableHeader.map((header, indexColumn) => (
                                 <td 

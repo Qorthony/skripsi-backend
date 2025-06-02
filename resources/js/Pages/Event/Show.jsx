@@ -107,13 +107,18 @@ const Header = ({ event, tickets }) => {
                         <AfterSubmissionModal onClose={() => setShowAfterSubmissionModal(false)} />
                     </Modal>
                 </>
-            )}
-            <PrimaryButton
-                onClick={() => router.visit(route('events.transactions.index', event.id))}
-                className="ml-4"
-            >
-                Lihat Transaksi
-            </PrimaryButton>
+            )}            <div className="flex gap-2">
+                <PrimaryButton
+                    onClick={() => router.visit(route('events.transactions.index', event.id))}
+                >
+                    Lihat Transaksi
+                </PrimaryButton>
+                <PrimaryButton
+                    onClick={() => router.visit(route('events.collaborators.index', event.id))}
+                >
+                    Kelola Kolaborator
+                </PrimaryButton>
+            </div>
         </div>
     );
 }
