@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use App\Models\Event;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
@@ -29,12 +30,13 @@ class TransactionController extends Controller
     }
 
     // Daftar transaksi berdasarkan event (admin & organizer)
-    public function byEvent(Event $event)
+    public function byEvent(Request $request, Event $event)
     {
-
         $response = Gate::inspect('view-event-transaction', $event);
-        if ($response->denied()) {
-            abort(403);
+        if( !$request->access_code) {
+            if ($response->denied()) {
+                abort(403);
+            }
         }
 
         $transactions = Transaction::with('user', 'event')
@@ -61,16 +63,19 @@ class TransactionController extends Controller
     }
 
     // Detail transaksi (admin & organizer)
-    public function show(Transaction $transaction)
+    public function show(Request $request, Event $event ,Transaction $transaction)
     {
         $response = Gate::inspect('view-transaction', $transaction);
-        if ($response->denied()) {
-            abort(403);
+        if( !$request->access_code) {
+            if ($response->denied()) {
+                abort(403);
+            }
         }
 
         $transaction->load('user', 'event.tickets.transactionItems');
         
         return Inertia::render('Transaction/Show', [
+            'event' => $event,
             'transaction' => $transaction,
         ]);
     }

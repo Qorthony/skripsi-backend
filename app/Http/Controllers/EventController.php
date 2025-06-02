@@ -50,8 +50,15 @@ class EventController extends Controller
         return redirect()->route('events.edit', $event->id);
     }
 
-    public function show(Event $event)
+    public function show(Request $request, Event $event)
     {
+        if ($request->access_code) {
+            return Inertia::render('Event/Show', [
+                'event' => $event,
+                'tickets' => $event->tickets,
+            ]);
+        }
+
         return Inertia::render('Event/Show', [
             'event' => $event,
             'tickets' => $event->tickets

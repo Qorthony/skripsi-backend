@@ -1,8 +1,10 @@
 import Container from '@/Components/Container';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function TransactionList({ event, transactions, stats }) {
+    const collaborator = usePage().props.collaborator;
+    
     return (
         <AuthenticatedLayout
             header={<Header/>}
@@ -12,7 +14,7 @@ export default function TransactionList({ event, transactions, stats }) {
                 <Container>
                     <h1 className="text-2xl font-bold mb-4">
                         Transaksi Event:  
-                        <a href={route('events.show', event.id)} className='text-blue-600 hover:underline'>
+                        <a href={collaborator?route('events.show.collaborator', {event:event.id, access_code:collaborator.kode_akses}) : route('events.show', event.id)} className='text-blue-600 hover:underline'>
                             {event.nama}
                         </a> 
                     </h1>
@@ -63,7 +65,19 @@ export default function TransactionList({ event, transactions, stats }) {
                                         <td className="px-4 py-2">Rp{trx.total_harga?.toLocaleString()}</td>
                                         <td className="px-4 py-2">{new Date(trx.created_at).toLocaleString()}</td>
                                         <td className="px-4 py-2">
-                                            <Link href={route('transactions.show', trx.id)} className="text-blue-600 hover:underline">Detail</Link>
+                                            <Link 
+                                                href={
+                                                    collaborator? 
+                                                    route('transactions.show.collaborator', {
+                                                        event: event.id,
+                                                        transaction:trx.id, 
+                                                        access_code: collaborator.kode_akses
+                                                    }): 
+                                                    route('transactions.show', trx.id)} 
+                                                className="text-blue-600 hover:underline"
+                                            >
+                                                Detail
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))}

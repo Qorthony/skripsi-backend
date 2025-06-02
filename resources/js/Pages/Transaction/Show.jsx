@@ -1,8 +1,10 @@
 import Container from '@/Components/Container';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
-export default function TransactionShow({ transaction }) {
+export default function TransactionShow({ event,transaction }) {
+    const collaborator = usePage().props.collaborator;
+
     const statusClass = {
         pending: "rounded-full px-2 bg-yellow-100 text-yellow-800",
         payment: "rounded-full px-2 bg-blue-100 text-blue-800",
@@ -21,7 +23,7 @@ export default function TransactionShow({ transaction }) {
                         <div className="mb-2"><b className='text-gray-500'>ID:</b> {transaction.id}</div>
                         <div className="mb-2">
                             <b className='text-gray-500'>Event:</b> 
-                            <a href={route('events.show', transaction.event?.id)} className='text-blue-600 hover:underline'>
+                            <a href={collaborator?route('events.show.collaborator', {event:event.id, access_code:collaborator.kode_akses}) : route('events.show', event.id)} className='text-blue-600 hover:underline'>
                                 {transaction.event?.nama}
                             </a> 
                         </div>

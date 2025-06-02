@@ -2,9 +2,9 @@ import Dropdown from "@/Components/Dropdown";
 import Modal from "@/Components/Modal";
 import PrimaryButton from "@/Components/PrimaryButton";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import DeleteEventForm from "./Partials/DeleteEventForm";
-import { useState } from "react";
+import { use, useState } from "react";
 import dayjs from "dayjs";
 import AfterSubmissionModal from "./Partials/AfterSubmissionModal";
 import DetailEventSection from "./Partials/DetailEventSection";
@@ -22,6 +22,10 @@ export default function Show({ event, tickets }) {
 }
 
 const Header = ({ event, tickets }) => {
+    const user = usePage().props.auth?.user;
+    const collaborator = usePage().props.collaborator;
+    
+    
     const [showModal, setShowModal] = useState(false);
     const [showAfterSubmissionModal, setShowAfterSubmissionModal] = useState(false);
 
@@ -107,17 +111,25 @@ const Header = ({ event, tickets }) => {
                         <AfterSubmissionModal onClose={() => setShowAfterSubmissionModal(false)} />
                     </Modal>
                 </>
-            )}            <div className="flex gap-2">
+            )}            
+            <div className="flex gap-2">
                 <PrimaryButton
-                    onClick={() => router.visit(route('events.transactions.index', event.id))}
+                    onClick={() => collaborator?
+                        router.visit(route('events.transactions.index.collaborator', { event: event.id, access_code: collaborator.kode_akses }))
+                        : router.visit(route('events.transactions.index', event.id))
+                    }
                 >
                     Lihat Transaksi
                 </PrimaryButton>
-                <PrimaryButton
-                    onClick={() => router.visit(route('events.collaborators.index', event.id))}
-                >
-                    Kelola Kolaborator
-                </PrimaryButton>
+                {
+                    user?.role === 'organizer' && (
+                        <PrimaryButton
+                            onClick={() => router.visit(route('events.collaborators.index', event.id))}
+                        >
+                            Kelola Kolaborator
+                        </PrimaryButton>
+                    )
+                }
             </div>
         </div>
     );

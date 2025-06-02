@@ -5,10 +5,11 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
 
 export default function Index({ event, collaborators }) {
+    console.log('collaborators:', collaborators);
+    
     const tableHeader = [
         { label: 'Nama', key: 'nama' },
         { label: 'Email', key: 'email' },
-        { label: 'Kode Akses', key: 'kode_akses' },
     ];
 
     const handleEdit = (collaborator) => {
@@ -23,7 +24,15 @@ export default function Index({ event, collaborators }) {
         }
     };
 
+    const handleAccess = (collaborator) => {
+        router.visit(collaborator.access_link);
+    };
+
     const rowActions = [
+        {
+            label: 'Akses',
+            action: handleAccess,
+        },
         {
             label: 'Edit',
             action: handleEdit

@@ -6,10 +6,36 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+    const user = usePage().props.auth?.user;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+    
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-gray-100">
+                <nav className="border-b border-gray-100 bg-white">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div className="flex h-16 items-center justify-between">
+                            <div className="flex items-center">
+                                <Link href="/">
+                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                {header && (
+                    <header className="bg-white shadow">
+                        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                            {header}
+                        </div>
+                    </header>
+                )}
+                <main>{children}</main>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -24,21 +50,25 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={
-                                        user.role === 'admin'
-                                            ? route('admin.index')
-                                            : route('dashboard')
-                                    }
-                                    active={route().current(
-                                        user.role === 'admin'
-                                            ? 'admin.index'
-                                            : 'dashboard',
-                                    )}
-                                >
-                                    Dashboard
-                                </NavLink>
-                                {user.role === 'organizer' && (
+                                {
+                                    user && (
+                                        <NavLink
+                                            href={
+                                                user?.role === 'admin'
+                                                    ? route('admin.index')
+                                                    : route('dashboard')
+                                            }
+                                            active={route().current(
+                                                user?.role === 'admin'
+                                                    ? 'admin.index'
+                                                    : 'dashboard',
+                                            )}
+                                        >
+                                            Dashboard
+                                        </NavLink>
+                                    )
+                                } 
+                                {user?.role === 'organizer' && (
                                     <NavLink
                                         href={route('events.index')}
                                     active={route().current('events.index')}
@@ -47,7 +77,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </NavLink>
                                 )}
 
-                                {user.role === 'admin' && (
+                                {user?.role === 'admin' && (
                                     <NavLink
                                         href={route('admin.event-submission.index')}
                                         active={route().current('admin.event-submission.index')}
@@ -55,7 +85,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Event Submission
                                     </NavLink>
                                 )}
-                                {user.role === 'admin' && (
+                                {user?.role === 'admin' && (
                                     <NavLink
                                         href={route('admin.transactions.index')}
                                         active={route().current('admin.transactions.index')}
@@ -75,7 +105,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 type="button"
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
-                                                {user.name}
+                                                {user?.name}
 
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
@@ -99,7 +129,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Profile
                                         </Dropdown.Link>
-                                        {user.role === 'organizer' && (
+                                        {user?.role === 'organizer' && (
                                             <Dropdown.Link
                                                 href={route('organizer.index')}
                                         >
@@ -170,13 +200,13 @@ export default function AuthenticatedLayout({ header, children }) {
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
                             href={
-                                user.role === 'admin'
+                                user?.role === 'admin'
                                     ? route('admin.index')
                                     : route('dashboard')
                             }
                             active={
                                 route().current(
-                                    user.role === 'admin'
+                                    user?.role === 'admin'
                                         ? 'admin.index'
                                         : 'dashboard',
                                 )
@@ -184,7 +214,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         >
                             Dashboard
                         </ResponsiveNavLink>
-                        {user.role === 'organizer' && (
+                        {user?.role === 'organizer' && (
                             <ResponsiveNavLink
                                 href={route('events.index')}
                                 active={route().current('events.index')}
@@ -192,7 +222,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 Events
                             </ResponsiveNavLink>
                         )}
-                        {user.role === 'admin' && (
+                        {user?.role === 'admin' && (
                             <ResponsiveNavLink
                                 href={route('admin.event-submission.index')}
                                 active={route().current('admin.event-submission.index')}
@@ -200,7 +230,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 Event Submission
                             </ResponsiveNavLink>
                         )}
-                        {user.role === 'admin' && (
+                        {user?.role === 'admin' && (
                             <ResponsiveNavLink
                                 href={route('admin.transactions.index')}
                                 active={route().current('admin.transactions.index')}
@@ -213,10 +243,10 @@ export default function AuthenticatedLayout({ header, children }) {
                     <div className="border-t border-gray-200 pb-1 pt-4">
                         <div className="px-4">
                             <div className="text-base font-medium text-gray-800">
-                                {user.name}
+                                {user?.name}
                             </div>
                             <div className="text-sm font-medium text-gray-500">
-                                {user.email}
+                                {user?.email}
                             </div>
                         </div>
 

@@ -88,6 +88,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
 });
 
+Route::middleware(['collaborator'])
+    ->prefix('collaborator/events/{event}')
+    ->group(function () {
+        Route::get('/', [EventController::class, 'show'])->name('events.show.collaborator');
+        Route::get('/transactions', [TransactionController::class, 'byEvent'])->name('events.transactions.index.collaborator');
+        Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show.collaborator');
+    });
+
 require __DIR__.'/auth.php';
 
 require __DIR__.'/admin.php';

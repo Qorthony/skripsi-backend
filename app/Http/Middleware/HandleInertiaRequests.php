@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Collaborator;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -34,6 +35,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'collaborator' => $request->access_code? Collaborator::where('kode_akses', $request->access_code)
+                ->first(): null,
         ];
     }
 }
