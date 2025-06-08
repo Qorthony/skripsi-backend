@@ -1,0 +1,26 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.qorthony.skripsi",
+      "sha256_cert_fingerprints": ["E5:D7:C9:0C:B5:6B:33:72:97:87:FC:9C:8B:5F:8A:FC:2F:0C:C0:FD:63:75:C6:B9:86:16:91:87:59:93:B6:25"]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.qorthony.skripsi.preview",
+      "sha256_cert_fingerprints": ["66:93:DC:A2:73:AE:62:71:59:65:9F:AA:3E:8D:56:2F:47:DF:86:C9:59:F8:20:D5:DF:8D:42:D9:82:A7:DB:8A"]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.qorthony.skripsi.dev",
+      "sha256_cert_fingerprints": ["AC:FF:AD:63:C6:9E:A5:3F:F8:B2:8F:EA:72:DA:60:3B:B5:D1:3A:0A:1D:1F:50:35:F8:B1:EF:8F:F3:7E:E1:B7"]
+    }
+  }
+]
