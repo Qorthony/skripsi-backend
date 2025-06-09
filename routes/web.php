@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -49,7 +50,7 @@ Route::get('/.well-known/assetlinks.json', function () {
             ]
         ]
     ]);
-})->withoutMiddleware([HandleInertiaRequests::class])
+})->withoutMiddleware([HandleInertiaRequests::class,AddLinkHeadersForPreloadedAssets::class])
   ->name('assetlinks');
 
 
