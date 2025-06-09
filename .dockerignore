@@ -1,1 +1,41 @@
 .docker-dev
+
+# Node
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+
+# PHP / Composer
+vendor
+
+# Laravel specific
+storage/
+.env
+.env.*
+
+# Log
+*.log
+
+# Vite / Build
+dist
+public/build
+public/storage
+
+# Git
+.git
+.gitignore
+
+# Docker
+.docker-dev/
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

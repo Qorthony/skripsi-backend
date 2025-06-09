@@ -8,6 +8,8 @@ services:
       - "80:80" # HTTP
       - "443:443" # HTTPS
       - "443:443/udp" # HTTP/3
+    env_file:
+      - .env
     environment:
       - DB_CONNECTION=mysql
       - DB_HOST=db
@@ -15,11 +17,70 @@ services:
       - DB_DATABASE=laravel
       - DB_USERNAME=laravel
       - DB_PASSWORD=secret
+      - OCTANE_SERVER=frankenphp
+      - APP_ENV=production
+      - APP_DEBUG=false
     depends_on:
       - db
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=secret
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - QUEUE_CONNECTION=database
+    depends_on:
+      - db
+      - app
+    command: >
+      sh -c "
+        echo 'Waiting for main app to be ready...' &&
+        sleep 30 &&
+        php artisan queue:work --verbose --sleep=3 --tries=3 --max-time=3600 --timeout=60
+      "
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=secret
+      - APP_ENV=production
+      - APP_DEBUG=false
+    depends_on:
+      - db
+      - app
+    command: >
+      sh -c "
+        echo 'Starting Laravel scheduler...' &&
+        while true; do
+          php artisan schedule:run --verbose --no-interaction &
+          sleep 60
+        done
+      "
+
   db:
     image: mysql:8.0
     restart: always
