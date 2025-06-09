@@ -11,6 +11,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::get('/.health', function () {
+    return response()->json(['status' => 'ok']);
+})->name('health');
+
 Route::get('/.well-known/assetlinks.json', function () {
     return response()->json([
         [
