@@ -21,6 +21,6 @@ php artisan migrate --force
 rm -f storage/logs/octane.pid
 
 # Start Octane with proper config for Docker and no daemon mode
-php artisan octane:frankenphp --host=0.0.0.0 --port=80 --admin-port=2019 --max-requests=1000 --workers=auto
+php artisan octane:frankenphp --host=0.0.0.0 --port=8000 --admin-port=2019 --max-requests=1000 --workers=auto
 # Wait for all processes to complete
 wait
