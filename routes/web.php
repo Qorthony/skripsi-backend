@@ -76,7 +76,7 @@ Route::get('/link', function () {
     return 'Redirecting to mobile app...';
 });
 
-Route::get('/link/{event}', function (Event $event) {
+Route::get('/link/events/{event}', function (Event $event) {
     return 'redirecting to mobile app for event: ' . htmlspecialchars($event->nama);
 })->name('link.event');
 
