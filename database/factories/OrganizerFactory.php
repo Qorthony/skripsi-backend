@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +18,7 @@ class OrganizerFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => User::factory(), // Default to null, can be set later
             'nama'=>fake()->company(),
             'deskripsi'=>fake()->sentence(),
             'alamat'=>fake()->address()

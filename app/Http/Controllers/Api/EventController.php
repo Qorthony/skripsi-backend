@@ -40,6 +40,13 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
+        if ($event->status !== 'published') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Event not found or not published'
+            ], 404);
+        }
+        
         return response()->json([
             'status' => 'success',
             'message' => 'Event detail',

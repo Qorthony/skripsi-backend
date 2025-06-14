@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Ticket;
 use App\Models\Transaction;
+use App\Models\TransactionItem;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,10 +21,18 @@ class TicketIssuedFactory extends Factory
     public function definition(): array
     {
         return [
-            'transaction_id' => Transaction::factory(),
-            'ticket_id' => Ticket::factory(),
+            'transaction_item_id' => TransactionItem::factory(),
             'user_id' => User::factory(),
             'email_penerima' => fake()->email(),
         ];
+    }
+
+    public function inactive(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => fake()->randomElement(['inactive', 'resale', 'sold', 'checkin']),
+            ];
+        });
     }
 }

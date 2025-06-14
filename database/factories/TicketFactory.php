@@ -17,6 +17,7 @@ class TicketFactory extends Factory
     public function definition(): array
     {
         return [
+            'event_id' => \App\Models\Event::factory(),
             'nama'=>'gratis',
             'harga'=>0,
             'kuota'=>100,

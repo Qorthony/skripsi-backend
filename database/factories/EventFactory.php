@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\EventStatus;
 use App\Models\Event;
+use App\Models\Organizer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,6 +20,7 @@ class EventFactory extends Factory
     public function definition(): array
     {
         return [
+            'organizer_id' => Organizer::factory(),
             'nama'=>fake()->sentence(3),
             'lokasi'=>'offline',
             'kota'=>fake()->city(),
