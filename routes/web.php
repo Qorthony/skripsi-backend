@@ -8,6 +8,7 @@ use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Models\Event;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,14 @@ Route::get('/', function () {
         ],
     ]);
 })->name('home');
+
+Route::get('/link', function () {
+    return 'Redirecting to mobile app...';
+});
+
+Route::get('/link/{event}', function (Event $event) {
+    return 'redirecting to mobile app for event: ' . htmlspecialchars($event->nama);
+})->name('link.event');
 
 Route::group([
     'middleware' => ['auth', 'verified'],
