@@ -12,7 +12,7 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
-RUN install-php-extensions \
+RUN install-php-extensions @composer \
     pcntl \
 	pdo_mysql \
 	gd \
@@ -49,6 +49,8 @@ COPY start-dev.sh /usr/local/bin/start-dev.sh
 RUN chmod +x /usr/local/bin/start-dev.sh
 
 WORKDIR /app
+
+RUN composer install --no-interaction
 
 RUN npm install
 
