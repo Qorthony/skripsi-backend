@@ -73,12 +73,18 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/link', function () {
-    return 'Redirecting to mobile app...';
-});
+    return Inertia::render('MobileLink',[
+        'intentLink'=>'intent://#Intent;scheme=skripsi;package=com.qorthony.skripsi.preview;end',
+        'downloadLink'=>'https://expo.dev/accounts/qorthony/projects/skripsi/builds/77d96a6b-a71e-4786-afc2-0e3ddf67aa14'
+    ]);
+})->name('mobilelink');
 
-Route::get('/link/events/{event}', function (Event $event) {
-    return 'redirecting to mobile app for event: ' . htmlspecialchars($event->nama);
-})->name('link.event');
+Route::get('/link/events/{event}', function ($event) {
+    return Inertia::render('MobileLink',[
+        'intentLink'=>'intent://events/'.$event.'#Intent;scheme=skripsi;package=com.qorthony.skripsi.preview;end',
+        'downloadLink'=>'https://expo.dev/accounts/qorthony/projects/skripsi/builds/77d96a6b-a71e-4786-afc2-0e3ddf67aa14'
+    ]);
+})->name('mobilelink.event');
 
 Route::group([
     'middleware' => ['auth', 'verified'],
