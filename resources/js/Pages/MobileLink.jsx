@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import React, { use, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 function isAndroid() {
     return /Android/i.test(navigator.userAgent);
@@ -20,7 +20,8 @@ const MobileLink = ({intentLink,downloadLink}) => {
 
     if (isAndroid()) {
         return (
-            <Head title='Link to Mobile App'>
+            <>
+                <Head title='Link to Mobile App'/>
                 <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white px-4">
                     <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
                         <h1 className="text-2xl font-bold mb-6">Buka di Aplikasi Android</h1>
@@ -43,13 +44,14 @@ const MobileLink = ({intentLink,downloadLink}) => {
                         </div>
                     </div>
                 </div>
-            </Head>
+            </>
         );
     }
 
     // Jika bukan Android (desktop atau iOS)
     return (
-        <Head title='Link to Mobile App'>
+        <>
+            <Head title='Link to Mobile App'/>
             <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white px-4">
                 <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
                     <h1 className="text-2xl font-bold mb-6">Download Aplikasi Android</h1>
@@ -63,7 +65,7 @@ const MobileLink = ({intentLink,downloadLink}) => {
                     </a>
                 </div>
             </div>
-        </Head>
+        </>
     );
 };
 
