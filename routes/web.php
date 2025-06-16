@@ -11,6 +11,7 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\Event;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -72,16 +73,20 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('/link', function () {
+Route::get('/link', function (Request $request) {
+    $variant = $request->query('variant');
+    $env = $variant?? 'preview';
     return Inertia::render('MobileLink',[
-        'intentLink'=>'intent://#Intent;scheme=skripsi;package=com.qorthony.skripsi.preview;end',
+        'intentLink'=>'intent://#Intent;scheme=skripsi;package=com.qorthony.skripsi.'.$env.';end',
         'downloadLink'=>'https://expo.dev/accounts/qorthony/projects/skripsi/builds/77d96a6b-a71e-4786-afc2-0e3ddf67aa14'
     ]);
 })->name('mobilelink');
 
-Route::get('/link/events/{event}', function ($event) {
+Route::get('/link/events/{event}', function (Request $request, $event) {
+    $variant = $request->query('variant');
+    $env = $variant?? 'preview';
     return Inertia::render('MobileLink',[
-        'intentLink'=>'intent://events/'.$event.'#Intent;scheme=skripsi;package=com.qorthony.skripsi.preview;end',
+        'intentLink'=>'intent://events/'.$event.'#Intent;scheme=skripsi;package=com.qorthony.skripsi.'.$env.';end',
         'downloadLink'=>'https://expo.dev/accounts/qorthony/projects/skripsi/builds/77d96a6b-a71e-4786-afc2-0e3ddf67aa14'
     ]);
 })->name('mobilelink.event');
