@@ -19,5 +19,5 @@ jobs:
           script: |
             cd /home/docker/skripsi-backend
             git pull origin main
-            docker compose down
-            docker compose up -d --build
+            docker compose -f compose.prod.yaml down
+            FRANKENPHP_CONFIG="worker ./app/public/index.php" SERVER_NAME=skripsi.qorthony.my.id docker compose -f compose.prod.yaml up --build -d
