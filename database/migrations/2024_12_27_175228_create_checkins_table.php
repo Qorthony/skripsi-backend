@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('checkins', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('ticket_issued_id')->constrained();
-            $table->uuid('user_id')->constrained();
+            $table->uuidMorphs('checkinable');
             $table->timestamp('checked_in_at')->nullable();
             $table->timestamp('checked_out_at')->nullable();
             $table->timestamps();

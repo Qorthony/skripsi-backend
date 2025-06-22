@@ -7,6 +7,7 @@ use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\LoginVerifyOtpRequest;
 use App\Http\Requests\Api\RegisterRequest;
 use App\Http\Requests\Api\RegisterVerifyOtpRequest;
+use App\Models\GateKeeper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
@@ -178,6 +179,38 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'User logged out successfully'
+        ], 200);
+    }
+
+    public function gateKeeperAccess(Request $request)
+    {
+        $request->validate([
+            'event_id' => 'required|uuid',
+            'kode_akses' => 'required|uuid'
+        ]);
+
+        $gateKeeper = GateKeeper::where('event_id', $request->event_id)
+            ->where('kode_akses', $request->kode_akses)
+            ->first();
+
+        if (!$gateKeeper) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid access code or event not found'
+            ], 404);
+        }
+
+        $token = $gateKeeper->createToken('gate_keeper_token', [
+            'organizer:events',
+            'organizer:checkin',
+            'organizer:attendance',
+        ])->plainTextToken;
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Access granted',
+            'gate_keeper' => $gateKeeper,
+            'token' => $token
         ], 200);
     }
 }

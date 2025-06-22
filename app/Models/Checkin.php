@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Checkin extends Model
 {
@@ -11,7 +12,8 @@ class Checkin extends Model
 
     protected $fillable = [
         'ticket_issued_id',
-        'user_id',
+        'checkinable_type',
+        'checkinable_id',
         'checked_in_at',
         'checked_out_at',
     ];
@@ -26,9 +28,9 @@ class Checkin extends Model
         return $this->belongsTo(TicketIssued::class);
     }
 
-    public function user()
+    public function checkinable(): MorphTo
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 
     public function scopeCheckedIn($query)

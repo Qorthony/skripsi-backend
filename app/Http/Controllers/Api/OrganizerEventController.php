@@ -21,8 +21,13 @@ class OrganizerEventController extends Controller
         $ongoing = $request->query('ongoing');
         $organizer = $user->organizer;
 
-        
-        $query = Event::where('organizer_id', $organizer->id);
+        if ($organizer) {
+            $query = Event::where('organizer_id', $organizer->id);
+        } else {
+            $query = Event::whereHas('gateKeepers', function ($q) use ($user) {
+                $q->where('id', $user->id);
+            });
+        }
         
         $order = 'desc';
 
@@ -45,6 +50,14 @@ class OrganizerEventController extends Controller
     // 3. Daftar transaksi event
     public function transactions(OrganizerEventDetailRequest $request, Event $event)
     {
+        $user = $request->user();
+        if ($user->tokenCant('organizer:transactions')) {
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Unauthorized']
+            , 403);
+        }
+
         $status = $request->query('status');
         $order = $request->query('order', 'desc');
         $query = $event->transactions()->with(['user','event','transactionItems.ticket', 'transactionItems.ticketIssueds']);
@@ -128,7 +141,6 @@ class OrganizerEventController extends Controller
     // 5. Proses checkin berdasarkan kode tiket
     public function checkin(OrganizerEventCheckinRequest $request, Event $event)
     {
-        // Validasi user harus organizer dan pembuat event
         $user = request()->user();
 
         $kodeTiket = $request['kode_tiket'];
@@ -166,10 +178,22 @@ class OrganizerEventController extends Controller
                 'status' => 'checkin',
             ]);
 
-            $ticketIssued->checkins()->create([
-                'user_id' => $user->id,
-                'checked_in_at' => now()
-            ]);
+            if ($user->role==='organizer') {
+                $ticketIssued->checkins()->create([
+                    'checkinable_id' => $user->id,
+                    'checkinable_type' => 'App\Models\User',
+                    'checked_in_at' => now()
+                ]);
+            }
+
+            if ($user->kode_akses) {
+                $ticketIssued->checkins()->create([
+                    'checkinable_id' => $user->id,
+                    'checkinable_type' => 'App\Models\GateKeeper',
+                    'checked_in_at' => now()
+                ]);
+            }
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

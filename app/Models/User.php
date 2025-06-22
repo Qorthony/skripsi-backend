@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -62,8 +63,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(TicketIssued::class);
     }
 
-    public function checkins() : HasMany
+    public function checkins() : MorphMany
     {
-        return $this->hasMany(Checkin::class);
+        return $this->morphMany(Checkin::class, 'checkinable')->chaperone();
     }
 }

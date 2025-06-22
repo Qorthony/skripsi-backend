@@ -12,10 +12,26 @@ class OrganizerEventDetailRequest extends FormRequest
         $user = $this->user();
         $event = $this->route('event');
         // Pastikan user adalah organizer dan event milik organizer tsb
-        return $user 
+        if(
+            $user 
                 && $user->role === 'organizer' 
                 && $event 
-                && $event->organizer_id === $user->organizer->id;
+                && $event->organizer_id === $user->organizer->id
+        )
+        {
+            return true;
+        }
+
+        if(
+            $user 
+            && $user->kode_akses
+            && $user->event_id === $event->id
+        )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public function rules(): array

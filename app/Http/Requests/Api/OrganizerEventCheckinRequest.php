@@ -12,7 +12,26 @@ class OrganizerEventCheckinRequest extends FormRequest
         $user = $this->user();
         $event = $this->route('event');
         // Validasi user harus organizer dan pembuat event
-        return $user && $user->role === 'organizer' && $user->organizer && $event && $user->organizer->id === $event->organizer_id;
+        if(
+            $user 
+                && $user->role === 'organizer' 
+                && $event 
+                && $event->organizer_id === $user->organizer->id
+        )
+        {
+            return true;
+        }
+
+        if(
+            $user 
+            && $user->kode_akses
+            && $user->event_id === $event->id
+        )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public function rules(): array

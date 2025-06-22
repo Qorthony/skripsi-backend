@@ -23,6 +23,7 @@ Route::post('/register/verifyOtp', [AuthController::class, 'registerVerifyOtp'])
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/login/resendOtp', [AuthController::class, 'resendLoginOtp']);
 Route::post('/login/verifyOtp', [AuthController::class, 'loginVerifyOtp']);
+Route::post('/gate-keeper/access', [AuthController::class, 'gateKeeperAccess']);
 
 
 Route::get('/midtrans/transaction/{orderId}', function ($orderId) {
