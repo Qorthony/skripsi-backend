@@ -29,6 +29,7 @@ class CollaboratorInvitation extends Notification implements ShouldQueue
             'collaborator_id' => $this->collaborator->id,
             'event_id' => $this->collaborator->event_id,
         ]);
+        
         return (new MailMessage)
             ->subject('Undangan Kolaborator Event - ' . $this->collaborator->event->nama)
             ->greeting('Halo ' . $this->collaborator->nama . '!')

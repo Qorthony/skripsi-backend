@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\GateKeeper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -54,6 +55,11 @@ class GateKeeperController extends Controller
         $validated['kode_akses'] = Str::uuid();
 
         GateKeeper::create($validated);
+
+        Notification::route('mail', $validated['email'])
+            ->notify(new \App\Notifications\GateKeeperMobileAccess(
+                GateKeeper::where('email', $validated['email'])->first()
+            ));
 
         return redirect()->route('events.gatekeepers.index', $event)
             ->with('success', 'Gate Keeper berhasil ditambahkan');

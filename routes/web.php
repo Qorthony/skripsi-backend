@@ -4,6 +4,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CollaboratorController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GateKeeperController;
+use App\Http\Controllers\MobileLinkController;
 use App\Http\Controllers\OrganizerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
@@ -73,23 +74,9 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('/link', function (Request $request) {
-    $variant = $request->query('variant');
-    $env = $variant?? 'preview';
-    return Inertia::render('MobileLink',[
-        'intentLink'=>'intent://#Intent;scheme=skripsi;package=com.qorthony.skripsi.'.$env.';end',
-        'downloadLink'=>'https://expo.dev/accounts/qorthony/projects/skripsi/builds/77d96a6b-a71e-4786-afc2-0e3ddf67aa14'
-    ]);
-})->name('mobilelink');
-
-Route::get('/link/events/{event}', function (Request $request, $event) {
-    $variant = $request->query('variant');
-    $env = $variant?? 'preview';
-    return Inertia::render('MobileLink',[
-        'intentLink'=>'intent://events/'.$event.'#Intent;scheme=skripsi;package=com.qorthony.skripsi.'.$env.';end',
-        'downloadLink'=>'https://expo.dev/accounts/qorthony/projects/skripsi/builds/77d96a6b-a71e-4786-afc2-0e3ddf67aa14'
-    ]);
-})->name('mobilelink.event');
+Route::get('/link', [MobileLinkController::class, 'index'])->name('mobilelink');
+Route::get('/link/events/{event}', [MobileLinkController::class, 'event'])->name('mobilelink.event');
+Route::get('/link/gatekeepers/{kode_akses}', [MobileLinkController::class, 'gatekeeper'])->name('mobilelink.gatekeeper');
 
 Route::group([
     'middleware' => ['auth', 'verified'],

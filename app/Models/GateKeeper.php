@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -27,5 +28,14 @@ class GateKeeper extends Model
     public function checkins(): MorphMany
     {
         return $this->morphMany(Checkin::class, 'checkinable')->chaperone();
+    }
+
+    protected function accessLink(): Attribute
+    {
+        return new Attribute(
+            get: fn () => route('mobilelink.gatekeeper', [
+                'kode_akses' => $this->kode_akses,
+            ])
+        );
     }
 }
