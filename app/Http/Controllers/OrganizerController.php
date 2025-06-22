@@ -40,7 +40,7 @@ class OrganizerController extends Controller
         ]);
 
         if ($request->hasFile('newLogo')) {
-            $validated['logo'] = $request->file('newLogo')->store('organizer-logo', 'public');
+            $validated['logo'] = $request->file('newLogo')->store('organizer-logo');
         } else {
             $validated['logo'] = Auth::user()->organizer->logo;
         }

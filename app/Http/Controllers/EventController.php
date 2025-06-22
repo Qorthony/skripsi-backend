@@ -41,7 +41,7 @@ class EventController extends Controller
 
         // Proses upload poster jika ada
         if ($request->hasFile('poster')) {
-            $path = $request->file('poster')->store('posters', 'public');
+            $path = $request->file('poster')->store('posters');
             $validated['poster'] = $path;
         }
 
@@ -89,7 +89,7 @@ class EventController extends Controller
 
         // Proses upload poster jika ada
         if ($request->hasFile('poster')) {
-            $path = $request->file('poster')->store('posters', 'public');
+            $path = $request->file('poster')->store('posters');
             $validated['poster'] = $path;
         }
 
