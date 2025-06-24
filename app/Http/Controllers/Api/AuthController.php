@@ -185,12 +185,10 @@ class AuthController extends Controller
     public function gateKeeperAccess(Request $request)
     {
         $request->validate([
-            'event_id' => 'required|uuid',
             'kode_akses' => 'required|uuid'
         ]);
 
-        $gateKeeper = GateKeeper::where('event_id', $request->event_id)
-            ->where('kode_akses', $request->kode_akses)
+        $gateKeeper = GateKeeper::where('kode_akses', $request->kode_akses)
             ->first();
 
         if (!$gateKeeper) {
