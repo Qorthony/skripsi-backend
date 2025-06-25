@@ -51,7 +51,17 @@ Route::get('/.well-known/assetlinks.json', function () {
                     "AC:FF:AD:63:C6:9E:A5:3F:F8:B2:8F:EA:72:DA:60:3B:B5:D1:3A:0A:1D:1F:50:35:F8:B1:EF:8F:F3:7E:E1:B7"
                 ]
             ]
-        ]
+        ],
+        [
+            "relation" => ["delegate_permission/common.handle_all_urls"],
+            "target" => [
+                "namespace" => "android_app",
+                "package_name" => "com.qorthony.skripsiorganizer.dev",
+                "sha256_cert_fingerprints" => [
+                    "0E:FA:AC:C3:6D:F2:A7:12:77:E0:19:5B:81:FF:F7:16:13:4B:35:E8:AB:3F:A3:E9:3F:E8:DA:34:2D:0C:58:83"
+                ]
+            ]
+        ],
     ]);
 })->withoutMiddleware([HandleInertiaRequests::class,AddLinkHeadersForPreloadedAssets::class])
   ->name('assetlinks');
