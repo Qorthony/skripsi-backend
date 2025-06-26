@@ -23,7 +23,8 @@ class LoginVerifyOtpRequest extends FormRequest
     {
         return [
             'email' => 'required|string|email',
-            'otp_code' => 'required|string'
+            'otp_code' => 'required|string',
+            'device_id'=> 'nullable',
         ];
     }
 }

@@ -90,10 +90,23 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email not registered'
+            ], 404);
+        }
+
+        
         $user->email_verified_at = now();
         $user->save();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
+        
+        if ($request->device_id){
+            $user->tokens()->where('device_name', $request->device_id)->delete();
+            $token = $user->createToken($request->device_id)->plainTextToken;
+        } else {
+            $token = $user->createToken('auth_token')->plainTextToken;
+        }
 
         return response()->json([
             'status' => 'success',
@@ -159,7 +172,12 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        if ($request->device_id){
+            $user->tokens()->where('device_name', $request->device_id)->delete();
+            $token = $user->createToken($request->device_id)->plainTextToken;
+        } else {
+            $token = $user->createToken('auth_token')->plainTextToken;
+        }
 
         if ($user->role == 'organizer') {
             $user->load('organizer');
